@@ -30,6 +30,9 @@ ACarPawn::ACarPawn()
 
 	CameraComponent->SetRelativeLocation(FVector(-332,0,311));
 	CameraComponent->SetRelativeRotation(FRotator(-10, 0, 0));
+
+	BodyMesh->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	BodyMesh->BodyInstance.bNotifyRigidBodyCollision = true;
 }
 
 // Called when the game starts or when spawned

@@ -3,6 +3,8 @@
 
 #include "Car/CarMovementComponent.h"
 
+#include <nvtesslib/inc/nvtess.h>
+
 // Sets default values for this component's properties
 UCarMovementComponent::UCarMovementComponent()
 {
@@ -38,7 +40,7 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 void UCarMovementComponent::SimulateMove(const FGoKartMove& Move)
 {
 	FVector Force = GetOwner()->GetActorForwardVector() * MaxDrivingForce * Move.Throttle;
-
+	Force += FVector::DownVector * -GetWorld()->GetGravityZ();
 	Force += GetAirResistance();
 	Force += GetRollingResistance();
 
@@ -87,11 +89,11 @@ void UCarMovementComponent::ApplyRotation(float DeltaTime, float m_SteeringThrow
 void UCarMovementComponent::UpdateLocationFromVelocity(float DeltaTime)
 {
 	FVector Translation = Velocity * 100 * DeltaTime;
-
 	FHitResult Hit;
 	GetOwner()->AddActorWorldOffset(Translation, true, &Hit);
 	if (Hit.IsValidBlockingHit())
 	{
+		UE_LOG(LogTemp, Log, TEXT("Hit"));
 		Velocity = FVector::ZeroVector;
 	}
 }
