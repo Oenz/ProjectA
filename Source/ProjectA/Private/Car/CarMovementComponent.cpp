@@ -39,8 +39,10 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UCarMovementComponent::SimulateMove(const FGoKartMove& Move)
 {
-	FVector Force = GetOwner()->GetActorForwardVector() * MaxDrivingForce * Move.Throttle;
-	Force += FVector::DownVector * -GetWorld()->GetGravityZ();
+	FVector ForwardForce = GetOwner()->GetActorForwardVector() * MaxDrivingForce * Move.Throttle;
+	FVector UpForce = GetOwner()->GetActorUpVector() * MaxClimbForce * Move.Pitch;
+	FVector Force = ForwardForce + UpForce;
+	//Force += FVector::DownVector * -GetWorld()->GetGravityZ();
 	Force += GetAirResistance();
 	Force += GetRollingResistance();
 
@@ -58,6 +60,7 @@ FGoKartMove UCarMovementComponent::CreateMove(float DeltaTime)
 	Move.DeltaTime = DeltaTime;
 	Move.SteeringThrow = SteeringThrow;
 	Move.Throttle = Throttle;
+	Move.Pitch = Pitch;
 	Move.Time = GetWorld()->TimeSeconds;
 
 	return Move;

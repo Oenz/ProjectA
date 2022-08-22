@@ -18,6 +18,9 @@ struct FGoKartMove
 	float SteeringThrow;
 
 	UPROPERTY()
+	float Pitch;
+
+	UPROPERTY()
 	float DeltaTime;
 
 	UPROPERTY()
@@ -50,6 +53,7 @@ public:
 	void SetVelocity(FVector Val) { Velocity = Val; };
 	void SetThrottle(float Val) { Throttle = Val; };
 	void SetSteeringThrow(float Val) { SteeringThrow = Val; };
+	void SetPitch(float Val) { Pitch = Val;};
 
 	FGoKartMove GetLastMove() { return LastMove; };
 
@@ -69,6 +73,9 @@ private:
 	float MaxDrivingForce = 10000;
 
 	UPROPERTY(EditAnywhere)
+	float MaxClimbForce = 1000;
+
+	UPROPERTY(EditAnywhere)
 	float MaxDegreesPerSecond = 90;
 
 	UPROPERTY(EditAnywhere)
@@ -79,6 +86,8 @@ private:
 	float Throttle;
 
 	float SteeringThrow;
+
+	float Pitch;
 
 	FVector GetAirResistance();
 

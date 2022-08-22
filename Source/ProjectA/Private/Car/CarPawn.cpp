@@ -2,10 +2,13 @@
 
 
 #include "Car/CarPawn.h"
+
+#include "Blueprint/UserWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "Car/CarMovementComponent.h"
 #include "Car/CarMovementReplicatorComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 ACarPawn::ACarPawn()
@@ -15,14 +18,16 @@ ACarPawn::ACarPawn()
 	bReplicates = true;
 	SetReplicateMovement(false);
 
+	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("BOXCollider"));
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
 	MovementComponent = CreateDefaultSubobject<UCarMovementComponent>(TEXT("MovementComponent"));
 	MovementReplicatorComponent = CreateDefaultSubobject<UCarMovementReplicatorComponent>(TEXT("MovementReplicator"));
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	
-	RootComponent = DefaultSceneRoot;
-	BodyMesh->SetupAttachment(RootComponent);
+	//RootComponent = DefaultSceneRoot;
+	DefaultSceneRoot->SetupAttachment(BoxCollider);
+	BodyMesh->SetupAttachment(DefaultSceneRoot);
 	CameraComponent->SetupAttachment(BodyMesh);
 
 	USkeletalMesh* LoadBody = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
@@ -31,19 +36,33 @@ ACarPawn::ACarPawn()
 	CameraComponent->SetRelativeLocation(FVector(-332,0,311));
 	CameraComponent->SetRelativeRotation(FRotator(-10, 0, 0));
 
-	BodyMesh->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
-	BodyMesh->BodyInstance.bNotifyRigidBodyCollision = true;
+	//BoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	//BoxCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Block);
+	BoxCollider->SetCollisionProfileName("BlockAll");
+	//BoxCollider->SetHiddenInGame(false);
+	BoxCollider->SetBoxExtent(FVector(230, 90, 80));
+	BoxCollider->SetGenerateOverlapEvents(true);
+	BoxCollider->BodyInstance.bNotifyRigidBodyCollision = true;
+
+	//Projectile = LoadObject<UStaticMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
+
 }
 
 // Called when the game starts or when spawned
 void ACarPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
+	MovementReplicatorComponent->SetMeshOffsetRoot(DefaultSceneRoot);
 	if (HasAuthority())
 	{
-		NetUpdateFrequency = 1;
+		NetUpdateFrequency = 20;
 	}
+	
+	
+	/*UBlueprint* WBP = LoadObject<UBlueprint>(NULL, TEXT("/Game/Widget/WBP_HUD.WBP_HUD"));
+	TSubclassOf<UUserWidget> HUDWidget = WBP->GeneratedClass;
+	UUserWidget* hud = CreateWidget<UUserWidget>(GetWorld(), HUDWidget);
+	hud->AddToViewport();*/
 }
 
 FString GetEnumText(ENetRole Role)
@@ -68,7 +87,7 @@ void ACarPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	DrawDebugString(GetWorld(), FVector(0, 0, 100), UEnum::GetValueAsString(GetLocalRole()), this, FColor::White, DeltaTime);
+	//DrawDebugString(GetWorld(), FVector(0, 0, 100), UEnum::GetValueAsString(GetLocalRole()), this, FColor::White, DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -77,6 +96,8 @@ void ACarPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACarPawn::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACarPawn::MoveRight);
+	PlayerInputComponent->BindAxis("MoveUp", this, &ACarPawn::MoveUp);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &ACarPawn::Fire);
 
 }
 
@@ -93,3 +114,16 @@ void ACarPawn::MoveRight(float Value)
 
 	MovementComponent->SetSteeringThrow(Value);
 }
+
+void ACarPawn::MoveUp(float Value)
+{
+	if(MovementComponent == nullptr) return;
+
+	MovementComponent->SetPitch(Value);
+}
+
+void ACarPawn::Fire()
+{
+	
+}
+

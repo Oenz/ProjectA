@@ -28,6 +28,9 @@ public:
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UBoxComponent* BoxCollider;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USceneComponent* DefaultSceneRoot;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -42,8 +45,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* CameraComponent;
 
+	//fire
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UStaticMesh* Projectile;
+
 private:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
+
+	void MoveUp(float Value);
+
+	void Fire();
 };
