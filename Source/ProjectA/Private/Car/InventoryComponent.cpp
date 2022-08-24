@@ -11,8 +11,6 @@ UInventoryComponent::UInventoryComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	CurrentItem = CreateDefaultSubobject<ABombItem>(TEXT("BombItem"));
 	// ...
 }
 
@@ -22,6 +20,9 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*CurrentItem = GetWorld()->SpawnActor<ABombItem>(GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation() ); 
+	CurrentItem->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	CurrentItem->SetOwner(GetOwner());*/
 	// ...
 	
 }
@@ -37,6 +38,15 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UInventoryComponent::UseCurrentItem()
 {
+	if(!IsValid(CurrentItem)) return;
 	CurrentItem->UseItem();
+	
+}
+
+void UInventoryComponent::EquipItem(AItemBase* item)
+{
+	item->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	item->SetOwner(GetOwner());
+	CurrentItem = item;
 }
 

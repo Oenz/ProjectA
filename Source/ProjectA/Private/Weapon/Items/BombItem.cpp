@@ -16,17 +16,19 @@ ABombItem::ABombItem()
 void ABombItem::UseItem()
 {
 	Super::UseItem();
-
-
-	TArray<AActor*> AttachedActors; 
+	UE_LOG(LogTemp, Warning, TEXT("USE"));
+	TArray<AActor*> AttachedActors;
 	GetOwner()->GetAttachedActors(AttachedActors);
-	AProjectileLauncher* ProjectileLauncher = nullptr;
 	for (AActor* Attached : AttachedActors)
 	{
-		ProjectileLauncher = Cast<AProjectileLauncher>(Attached);
-		if (IsValid(ProjectileLauncher)) break;
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Attached->GetName());
+		if (AProjectileLauncher* ProjectileLauncher = Cast<AProjectileLauncher>(Attached))
+		{
+			ProjectileLauncher->FireProjectile(BombProjectile);
+			UE_LOG(LogTemp, Warning, TEXT("BOMB"));
+			break;
+		}
+		
 	}
-	if(!IsValid(ProjectileLauncher)) return;
-	ProjectileLauncher->FireProjectile(BombProjectile);
-	UE_LOG(LogTemp, Warning, TEXT("USE BOMB"));
+	Destroy();
 }

@@ -13,6 +13,9 @@ AProjectile::AProjectile()
 
 	CollisionCOmponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	CollisionCOmponent->InitSphereRadius(60);
+	CollisionCOmponent->SetCollisionProfileName("BlockAll");
+	CollisionCOmponent->BodyInstance.bNotifyRigidBodyCollision = true;
+	
 	RootComponent = CollisionCOmponent;
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComponent->SetupAttachment(RootComponent);
@@ -26,7 +29,6 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 
 	CollisionCOmponent->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
-
 }
 	
 
@@ -34,6 +36,7 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	SetLifeSpan(5);
 }
 
 // Called every frame
@@ -50,7 +53,7 @@ void AProjectile::FireInDirection(const FVector& ShootDirection)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(HitParticle == nullptr) return;
+	//if(HitParticle == nullptr) return;
 	//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, Hit.ImpactPoint);
-	Destroy();
+	SetLifeSpan(0.01f);
 }

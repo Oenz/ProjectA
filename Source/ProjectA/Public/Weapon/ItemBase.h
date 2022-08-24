@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "ItemBase.generated.h"
 
@@ -15,6 +17,12 @@ public:
 	// Sets default values for this actor's properties
 	AItemBase();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UBoxComponent* BoxComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* MeshComponent;
+		
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -24,4 +32,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void UseItem();
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 };

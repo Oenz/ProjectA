@@ -69,7 +69,7 @@ void ACarPawn::BeginPlay()
 	ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(GetActorLocation(), GetActorRotation());
 	ProjectileLauncher->AttachToComponent(BoxCollider, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	ProjectileLauncher->SetActorRelativeLocation(GetActorForwardVector() * 300);//
-	
+ProjectileLauncher->SetOwner(this);
 	/*UBlueprint* WBP = LoadObject<UBlueprint>(NULL, TEXT("/Game/Widget/WBP_HUD.WBP_HUD"));
 	TSubclassOf<UUserWidget> HUDWidget = WBP->GeneratedClass;
 	UUserWidget* hud = CreateWidget<UUserWidget>(GetWorld(), HUDWidget);

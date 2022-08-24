@@ -29,13 +29,15 @@ void AProjectileLauncher::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetName());
+
 }
 
 void AProjectileLauncher::FireProjectile( TSubclassOf< AProjectile > ProjectileObject )
 {
 	FVector SpawnPos = GetActorLocation();// + GetActorForwardVector() * 100;
 	AProjectile* SpawnProjectile =  GetWorld()->SpawnActor<AProjectile>(ProjectileObject, SpawnPos, GetActorRotation());
-	
+	SpawnProjectile->SetOwner(GetOwner());
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if(PlayerController == nullptr) return;
 	FVector mouseLocation, mouseDirection;
