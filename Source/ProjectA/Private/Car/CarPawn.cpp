@@ -8,7 +8,13 @@
 #include "Car/CarMovementComponent.h"
 #include "Car/CarMovementReplicatorComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Car/InventoryComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Weapon/Projectile.h"
+#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
+#include "Weapon/ProjectileLauncher.h"
+
 
 // Sets default values
 ACarPawn::ACarPawn()
@@ -24,6 +30,7 @@ ACarPawn::ACarPawn()
 	MovementComponent = CreateDefaultSubobject<UCarMovementComponent>(TEXT("MovementComponent"));
 	MovementReplicatorComponent = CreateDefaultSubobject<UCarMovementReplicatorComponent>(TEXT("MovementReplicator"));
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	
 	//RootComponent = DefaultSceneRoot;
 	DefaultSceneRoot->SetupAttachment(BoxCollider);
@@ -45,6 +52,7 @@ ACarPawn::ACarPawn()
 	BoxCollider->BodyInstance.bNotifyRigidBodyCollision = true;
 
 	//Projectile = LoadObject<UStaticMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
+	Projectile = TSoftClassPtr<AProjectile>(FSoftObjectPath(TEXT("/Game/Blueprint/BP_Projectile.BP_Projectile_C"))).LoadSynchronous();
 
 }
 
@@ -58,6 +66,9 @@ void ACarPawn::BeginPlay()
 		NetUpdateFrequency = 20;
 	}
 	
+	ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(GetActorLocation(), GetActorRotation());
+	ProjectileLauncher->AttachToComponent(BoxCollider, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	ProjectileLauncher->SetActorRelativeLocation(GetActorForwardVector() * 300);//
 	
 	/*UBlueprint* WBP = LoadObject<UBlueprint>(NULL, TEXT("/Game/Widget/WBP_HUD.WBP_HUD"));
 	TSubclassOf<UUserWidget> HUDWidget = WBP->GeneratedClass;
@@ -98,6 +109,7 @@ void ACarPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACarPawn::MoveRight);
 	PlayerInputComponent->BindAxis("MoveUp", this, &ACarPawn::MoveUp);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &ACarPawn::Fire);
+	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ACarPawn::Use);
 
 }
 
@@ -124,6 +136,12 @@ void ACarPawn::MoveUp(float Value)
 
 void ACarPawn::Fire()
 {
-	
+	//load Failded
+	if(Projectile == nullptr || ProjectileLauncher == nullptr) return;
+	ProjectileLauncher->FireProjectile( Projectile );
 }
 
+void ACarPawn::Use()
+{
+	InventoryComponent->UseCurrentItem();
+}

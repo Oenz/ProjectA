@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Weapon/Projectile.h"
 #include "CarPawn.generated.h"
 
 UCLASS()
@@ -40,14 +41,21 @@ public:
 	class UCarMovementReplicatorComponent* MovementReplicatorComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UInventoryComponent* InventoryComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USkeletalMeshComponent* BodyMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* CameraComponent;
 
 	//fire
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStaticMesh* Projectile;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//class UStaticMesh* Projectile;
+
+	class AProjectileLauncher* ProjectileLauncher;
+	
+	TSubclassOf<AProjectile> Projectile;
 
 private:
 	void MoveForward(float Value);
@@ -57,4 +65,6 @@ private:
 	void MoveUp(float Value);
 
 	void Fire();
+	
+	void Use();
 };
