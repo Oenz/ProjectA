@@ -3,6 +3,7 @@
 
 #include "Weapon/Items/BombItem.h"
 
+#include "Weapon/BombProjectile.h"
 #include "Weapon/Projectile.h"
 #include "Weapon/ProjectileLauncher.h"
 
@@ -13,22 +14,46 @@ ABombItem::ABombItem()
 
 }
 
-void ABombItem::UseItem()
+void ABombItem::UseItem(EBlendType type)
 {
-	Super::UseItem();
+	Super::UseItem(type);
 	UE_LOG(LogTemp, Warning, TEXT("USE"));
 	TArray<AActor*> AttachedActors;
 	GetOwner()->GetAttachedActors(AttachedActors);
+	AProjectileLauncher* ProjectileLauncher = nullptr;
 	for (AActor* Attached : AttachedActors)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s"), *Attached->GetName());
-		if (AProjectileLauncher* ProjectileLauncher = Cast<AProjectileLauncher>(Attached))
+		if (AProjectileLauncher* temp = Cast<AProjectileLauncher>(Attached))
 		{
-			ProjectileLauncher->FireProjectile(BombProjectile);
-			UE_LOG(LogTemp, Warning, TEXT("BOMB"));
+			ProjectileLauncher = temp;
 			break;
 		}
 		
 	}
+	if(ProjectileLauncher == nullptr) return;
+	AProjectile* Projectile = ProjectileLauncher->FireProjectile(BombProjectile);
+	if(Projectile == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BombProjectile NULL"));
+		return;
+	}
+	
+	switch (type)
+	{
+	case EBlendType::Speed:
+		Projectile->SpeedUp();
+		break;
+	case EBlendType::Range:
+		Projectile->RangeUp();
+		break;
+	case EBlendType::Power:
+		Projectile->PowerUp();
+		break;
+	default:
+		break;
+	}
 	Destroy();
 }
+
+

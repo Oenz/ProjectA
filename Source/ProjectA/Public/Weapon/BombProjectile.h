@@ -16,4 +16,14 @@ class PROJECTA_API ABombProjectile : public AProjectile
 	
 public:
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
+
+	virtual void RangeUp() override { ExplosionRadius *= 2;};
+
+	virtual void PowerUp() override {StanTime *= 2;}
+
+private:
+
+	float ExplosionRadius = 1000;
+
+	float StanTime = 3;
 };

@@ -26,5 +26,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void FireProjectile( TSubclassOf< class AProjectile > ProjectileObject);
+	class AProjectile* FireProjectile( TSubclassOf< class AProjectile > ProjectileObject);
 };

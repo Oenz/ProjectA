@@ -40,7 +40,7 @@ void AItemBase::Tick(float DeltaTime)
 
 }
 
-void AItemBase::UseItem()
+void AItemBase::UseItem(EBlendType type)
 {
 	
 }
@@ -56,11 +56,7 @@ void AItemBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPr
 		UE_LOG(LogTemp, Warning, TEXT("Actor NULL"));
 		return;
 	}
-	AActor* Player = OtherActor->GetOwner();	if(!IsValid(Player))
-                                            	{
-                                            		UE_LOG(LogTemp, Warning, TEXT("Owner NULL"));
-                                            		return;
-                                            	}
+	AActor* Player = OtherActor->GetOwner();
 	if(!IsValid(Player))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Owner NULL"));

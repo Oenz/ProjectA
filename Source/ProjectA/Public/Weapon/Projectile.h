@@ -19,7 +19,7 @@ public:
 	AProjectile();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	USphereComponent* CollisionCOmponent;
+	USphereComponent* CollisionComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* MeshComponent;
@@ -43,4 +43,13 @@ public:
 
 	UFUNCTION(Category="Projectile")
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+	virtual  void SpeedUp();
+
+	UFUNCTION()
+	virtual  void RangeUp();
+
+	UFUNCTION()
+	virtual  void PowerUp();
 };

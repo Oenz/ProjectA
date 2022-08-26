@@ -17,7 +17,7 @@ class PROJECTA_API ABombItem : public AItemBase
 	ABombItem();
 	
 public:
-	virtual void UseItem() override;
+	virtual void UseItem(EBlendType type) override;
 
 private:
 	TSubclassOf<class AProjectile> BombProjectile;

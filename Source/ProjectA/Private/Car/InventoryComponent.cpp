@@ -3,6 +3,7 @@
 
 #include "Car/InventoryComponent.h"
 
+#include "Car/CarPlayerController.h"
 #include "Weapon/Items/BombItem.h"
 
 // Sets default values for this component's properties
@@ -39,14 +40,28 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 void UInventoryComponent::UseCurrentItem()
 {
 	if(!IsValid(CurrentItem)) return;
-	CurrentItem->UseItem();
-	
+	CurrentItem->UseItem(BlendType);
+	CurrentItem = nullptr;
+	ACarPlayerController* PC = Cast<ACarPlayerController>(GetOwner()->GetInstigatorController());
+	PC->OnItemChange();
 }
 
 void UInventoryComponent::EquipItem(AItemBase* item)
 {
+
+	if(CurrentItem != nullptr)
+	{
+		CurrentItem->Destroy();
+	}
 	item->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	item->SetOwner(GetOwner());
 	CurrentItem = item;
+	ACarPlayerController* PC = Cast<ACarPlayerController>(GetOwner()->GetInstigatorController());
+	PC->OnItemChange();
+}
+
+void UInventoryComponent::SwitchBlend()
+{
+	BlendType = static_cast<EBlendType>((static_cast<int>(BlendType) + 1) % 3);
 }
 

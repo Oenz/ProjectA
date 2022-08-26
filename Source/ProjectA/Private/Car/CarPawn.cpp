@@ -8,6 +8,7 @@
 #include "Car/CarMovementComponent.h"
 #include "Car/CarMovementReplicatorComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Car/CarPlayerController.h"
 #include "Car/InventoryComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -38,6 +39,7 @@ ACarPawn::ACarPawn()
 	CameraComponent->SetupAttachment(BodyMesh);
 
 	USkeletalMesh* LoadBody = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
+	//USkeletalMesh* LoadBody = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Assets/VigilanteContent/Vehicles/East_Fighter_Su33/SK_East_Fighter_Su33.SK_East_Fighter_Su33"), NULL, LOAD_None, NULL);
 	BodyMesh->SetSkeletalMesh(LoadBody);
 
 	CameraComponent->SetRelativeLocation(FVector(-332,0,311));
@@ -69,7 +71,7 @@ void ACarPawn::BeginPlay()
 	ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(GetActorLocation(), GetActorRotation());
 	ProjectileLauncher->AttachToComponent(BoxCollider, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	ProjectileLauncher->SetActorRelativeLocation(GetActorForwardVector() * 300);//
-ProjectileLauncher->SetOwner(this);
+	ProjectileLauncher->SetOwner(this);
 	/*UBlueprint* WBP = LoadObject<UBlueprint>(NULL, TEXT("/Game/Widget/WBP_HUD.WBP_HUD"));
 	TSubclassOf<UUserWidget> HUDWidget = WBP->GeneratedClass;
 	UUserWidget* hud = CreateWidget<UUserWidget>(GetWorld(), HUDWidget);
@@ -110,7 +112,7 @@ void ACarPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveUp", this, &ACarPawn::MoveUp);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &ACarPawn::Fire);
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ACarPawn::Use);
-
+	PlayerInputComponent->BindAction("SwitchBlend", IE_Pressed, this, &ACarPawn::SwitchBlend);
 }
 
 void ACarPawn::MoveForward(float Value)
@@ -145,3 +147,23 @@ void ACarPawn::Use()
 {
 	InventoryComponent->UseCurrentItem();
 }
+
+void ACarPawn::SwitchBlend()
+{
+	InventoryComponent->SwitchBlend();
+	ACarPlayerController* CPC = Cast<ACarPlayerController>(GetController());
+	CPC->OnSwitchBlend();
+}
+
+void ACarPawn::Stan(float second)
+{
+	FTimerHandle _TimerHandle;	
+	GetWorld()->GetTimerManager().SetTimer(_TimerHandle, this, &ACarPawn::EndStan,second, false);
+	DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Red, true, 5);
+}
+
+void ACarPawn::EndStan()
+{
+		DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Green, true, 1);
+}
+

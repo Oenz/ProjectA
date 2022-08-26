@@ -33,13 +33,13 @@ void AProjectileLauncher::Tick(float DeltaTime)
 
 }
 
-void AProjectileLauncher::FireProjectile( TSubclassOf< AProjectile > ProjectileObject )
+AProjectile* AProjectileLauncher::FireProjectile( TSubclassOf< AProjectile > ProjectileObject )
 {
 	FVector SpawnPos = GetActorLocation();// + GetActorForwardVector() * 100;
 	AProjectile* SpawnProjectile =  GetWorld()->SpawnActor<AProjectile>(ProjectileObject, SpawnPos, GetActorRotation());
 	SpawnProjectile->SetOwner(GetOwner());
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if(PlayerController == nullptr) return;
+	if(PlayerController == nullptr) return nullptr;
 	FVector mouseLocation, mouseDirection;
 	//GetWorld()->GetFirstPlayerController();
 	PlayerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
@@ -48,5 +48,6 @@ void AProjectileLauncher::FireProjectile( TSubclassOf< AProjectile > ProjectileO
 	FVector FireDirection = EndPoint - SpawnPos;
 	FireDirection.Normalize();
 	SpawnProjectile->FireInDirection(FireDirection);
+	return SpawnProjectile;
 }
 

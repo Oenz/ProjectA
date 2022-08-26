@@ -56,8 +56,10 @@ public:
 	class AProjectileLauncher* ProjectileLauncher;
 	
 	TSubclassOf<AProjectile> Projectile;
-
-private:
+	
+	void Stan(float second);
+	
+private://Controllerに移行
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
@@ -67,4 +69,8 @@ private:
 	void Fire();
 	
 	void Use();
+
+	void SwitchBlend();
+
+	void EndStan();
 };

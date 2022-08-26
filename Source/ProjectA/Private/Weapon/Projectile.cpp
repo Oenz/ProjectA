@@ -11,24 +11,24 @@ AProjectile::AProjectile()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionCOmponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
-	CollisionCOmponent->InitSphereRadius(60);
-	CollisionCOmponent->SetCollisionProfileName("BlockAll");
-	CollisionCOmponent->BodyInstance.bNotifyRigidBodyCollision = true;
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
+	CollisionComponent->InitSphereRadius(60);
+	CollisionComponent->SetCollisionProfileName("BlockAll");
+	CollisionComponent->BodyInstance.bNotifyRigidBodyCollision = true;
 	
-	RootComponent = CollisionCOmponent;
+	RootComponent = CollisionComponent;
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComponent->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	ProjectileMovementComponent->SetUpdatedComponent(CollisionCOmponent);
+	ProjectileMovementComponent->SetUpdatedComponent(CollisionComponent);
 	ProjectileMovementComponent->InitialSpeed = 10000.0f;
 	ProjectileMovementComponent->MaxSpeed = 10000.0f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = false;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 
-	CollisionCOmponent->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	CollisionComponent->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 }
 	
 
@@ -55,5 +55,20 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 {
 	//if(HitParticle == nullptr) return;
 	//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, Hit.ImpactPoint);
+	UE_LOG(LogTemp, Warning, TEXT("Projectile Hit"));
 	SetLifeSpan(0.01f);
+}
+
+void AProjectile::SpeedUp()
+{
+	ProjectileMovementComponent->MaxSpeed *= 3;
+	ProjectileMovementComponent->AddForce(ProjectileMovementComponent->Velocity * 3);
+}
+
+void AProjectile::RangeUp()
+{
+}
+
+void AProjectile::PowerUp()
+{
 }

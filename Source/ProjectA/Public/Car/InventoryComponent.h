@@ -6,6 +6,13 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EBlendType : uint8
+{
+	Speed,
+	Range,
+	Power
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTA_API UInventoryComponent : public UActorComponent
@@ -30,4 +37,9 @@ public:
 	void UseCurrentItem();
 
 	void EquipItem(class AItemBase* item);
+
+	void SwitchBlend();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EBlendType BlendType;
 };
