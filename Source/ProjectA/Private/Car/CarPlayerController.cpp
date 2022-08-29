@@ -4,21 +4,22 @@
 #include "Car/CarPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Car/CarPawn.h"
 #include "UI/HUDWidget.h"
+
+class UHUDWidget;
 
 ACarPlayerController::ACarPlayerController()
 {
-	HUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_HUD.WBP_HUD_C"))).LoadSynchronous();
+	GameHUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_GameHUD.WBP_GameHUD_C"))).LoadSynchronous();
+	WaitingHUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_WaitingHUD.WBP_WaitingHUD_C"))).LoadSynchronous();
+	GoalHUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_GoalHUD.WBP_GoalHUD_C"))).LoadSynchronous();
 }
 
 void ACarPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	UUserWidget* HUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDClass);
-		//CreateWidget(Cast<APawn>(GetOwner()), HUDClass, TEXT("HUD"));
-
-	HUDWidget->AddToViewport();
-	HUD = HUDWidget;
+	
 }
 
 void ACarPlayerController::SetupInputComponent()
@@ -26,6 +27,17 @@ void ACarPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	//InputComponent->BindAction("SwitchBlend", IE_Pressed, this, &ACarPlayerController::SwitchBlend);
+}
+
+void ACarPlayerController::SetHUD(TSubclassOf<UUserWidget> HUDClass)
+{
+	if(IsValid(HUD))
+	{
+		HUD->RemoveFromParent();
+	}
+	UUserWidget* HUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDClass);
+	HUDWidget->AddToViewport();
+	HUD = HUDWidget;
 }
 
 void ACarPlayerController::OnSwitchBlend()
@@ -42,4 +54,25 @@ void ACarPlayerController::OnItemChange()
 	hud->OnItemChanged();
 }
 
+
+
+void ACarPlayerController::ClientGameStart_Implementation()
+{
+	SetHUD(WaitingHUDClass);
+}
+
+void ACarPlayerController::ClientRaceStart_Implementation()
+{
+	SetHUD(GameHUDClass);
+	if(ACarPawn* player = Cast<ACarPawn>(GetPawn()))
+	{
+		player->SetFreezeMove(false);
+	}
+	
+}
+
+void ACarPlayerController::ClientRaceEnd_Implementation()
+{
+	SetHUD(GoalHUDClass);
+}
 

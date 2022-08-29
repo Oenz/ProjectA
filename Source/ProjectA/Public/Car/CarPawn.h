@@ -58,6 +58,10 @@ public:
 	TSubclassOf<AProjectile> Projectile;
 	
 	void Stan(float second);
+
+	bool freezeMove = false;
+
+	void SetFreezeMove(bool isFreeze);
 	
 private://Controllerに移行
 	void MoveForward(float Value);

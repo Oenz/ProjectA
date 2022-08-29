@@ -56,6 +56,7 @@ ACarPawn::ACarPawn()
 	//Projectile = LoadObject<UStaticMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
 	Projectile = TSoftClassPtr<AProjectile>(FSoftObjectPath(TEXT("/Game/Blueprint/BP_Projectile.BP_Projectile_C"))).LoadSynchronous();
 
+	Tags.Add(FName("Player"));
 }
 
 // Called when the game starts or when spawned
@@ -72,6 +73,10 @@ void ACarPawn::BeginPlay()
 	ProjectileLauncher->AttachToComponent(BoxCollider, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	ProjectileLauncher->SetActorRelativeLocation(GetActorForwardVector() * 300);//
 	ProjectileLauncher->SetOwner(this);
+
+	
+	SetFreezeMove(true);
+	//Cast<ACarPlayerController>(GetController())->SetHUD();
 	/*UBlueprint* WBP = LoadObject<UBlueprint>(NULL, TEXT("/Game/Widget/WBP_HUD.WBP_HUD"));
 	TSubclassOf<UUserWidget> HUDWidget = WBP->GeneratedClass;
 	UUserWidget* hud = CreateWidget<UUserWidget>(GetWorld(), HUDWidget);
@@ -117,6 +122,7 @@ void ACarPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ACarPawn::MoveForward(float Value)
 {
+	if(freezeMove) return;
 	if (MovementComponent == nullptr) return;
 
 	MovementComponent->SetThrottle(Value);
@@ -124,6 +130,7 @@ void ACarPawn::MoveForward(float Value)
 
 void ACarPawn::MoveRight(float Value)
 {
+	if(freezeMove) return;
 	if (MovementComponent == nullptr) return;
 
 	MovementComponent->SetSteeringThrow(Value);
@@ -131,6 +138,7 @@ void ACarPawn::MoveRight(float Value)
 
 void ACarPawn::MoveUp(float Value)
 {
+	if(freezeMove) return;
 	if(MovementComponent == nullptr) return;
 
 	MovementComponent->SetPitch(Value);
@@ -138,6 +146,7 @@ void ACarPawn::MoveUp(float Value)
 
 void ACarPawn::Fire()
 {
+	if(freezeMove) return;
 	//load Failded
 	if(Projectile == nullptr || ProjectileLauncher == nullptr) return;
 	ProjectileLauncher->FireProjectile( Projectile );
@@ -145,11 +154,13 @@ void ACarPawn::Fire()
 
 void ACarPawn::Use()
 {
+	if(freezeMove) return;
 	InventoryComponent->UseCurrentItem();
 }
 
 void ACarPawn::SwitchBlend()
 {
+	if(freezeMove) return;
 	InventoryComponent->SwitchBlend();
 	ACarPlayerController* CPC = Cast<ACarPlayerController>(GetController());
 	CPC->OnSwitchBlend();
@@ -157,13 +168,26 @@ void ACarPawn::SwitchBlend()
 
 void ACarPawn::Stan(float second)
 {
-	FTimerHandle _TimerHandle;	
+	FTimerHandle _TimerHandle;
+
+	SetFreezeMove(true);
 	GetWorld()->GetTimerManager().SetTimer(_TimerHandle, this, &ACarPawn::EndStan,second, false);
 	DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Red, true, 5);
 }
 
 void ACarPawn::EndStan()
 {
+	SetFreezeMove(false);
 		DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Green, true, 1);
 }
 
+void ACarPawn::SetFreezeMove(bool isFreeze)
+{
+	freezeMove = isFreeze;
+
+	if(!isFreeze) return;
+	
+	MovementComponent->SetThrottle(0);
+	MovementComponent->SetSteeringThrow(0);
+	MovementComponent->SetPitch(0);
+}

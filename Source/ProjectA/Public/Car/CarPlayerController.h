@@ -17,7 +17,11 @@ class PROJECTA_API ACarPlayerController : public APlayerController
 public:
 	ACarPlayerController();
 
-	TSubclassOf<class UUserWidget> HUDClass;
+	TSubclassOf<class UUserWidget> GameHUDClass;
+
+	TSubclassOf<class UUserWidget> WaitingHUDClass;
+
+	TSubclassOf<class UUserWidget> GoalHUDClass;
 
 	UUserWidget* HUD;
 	
@@ -25,8 +29,21 @@ public:
 
 	virtual void SetupInputComponent() override;
 
+	void SetHUD(TSubclassOf<class UUserWidget> HUDClass);
+	
 	UFUNCTION()
 	void OnSwitchBlend();
 
 	void OnItemChange();
+
+	UFUNCTION(Reliable, Client)
+	void ClientGameStart();
+	
+	UFUNCTION(Reliable, Client)
+	void ClientRaceStart();
+
+	
+	UFUNCTION(Reliable, Client)
+	void ClientRaceEnd();
+	
 };
