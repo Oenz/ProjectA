@@ -61,7 +61,7 @@ private:
 	FGoKartMove CreateMove(float DeltaTime);
 
 	UPROPERTY(EditAnywhere)
-	float Mass = 1000;
+	float Mass = 100;
 
 	UPROPERTY(EditAnywhere)
 	float DragCoefficient = 16;
@@ -79,7 +79,7 @@ private:
 	float MaxDegreesPerSecond = 90;
 
 	UPROPERTY(EditAnywhere)
-	float MinTurningRadius = 10;
+	float MinTurningRadius = 0.05f;
 
 	FVector Velocity;
 
@@ -93,7 +93,7 @@ private:
 
 	FVector GetRollingResistance();
 
-	void ApplyRotation(float DeltaTime, float m_SteeringThrow);
+	void ApplyRotation(float DeltaTime, float m_SteeringThrow, FVector direction);
 
 	void UpdateLocationFromVelocity(float DeltaTime);
 

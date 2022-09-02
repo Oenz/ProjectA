@@ -19,7 +19,8 @@ ACarPlayerController::ACarPlayerController()
 void ACarPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SetInputMode(FInputModeUIOnly());
+	this->bShowMouseCursor = true;
 }
 
 void ACarPlayerController::SetupInputComponent()
@@ -54,21 +55,29 @@ void ACarPlayerController::OnItemChange()
 	hud->OnItemChanged();
 }
 
+void ACarPlayerController::CarPossessPawn(APawn* PossessPawn)
+{
+	
+	SetInputMode(FInputModeGameOnly());
+	this->bShowMouseCursor = false;
+	if(HasAuthority())
+	{
+		this->UnPossess();
+		this->Possess(PossessPawn);
+		ClientGameStart(PossessPawn);
+	}
+}
 
 
-void ACarPlayerController::ClientGameStart_Implementation()
+void ACarPlayerController::ClientGameStart_Implementation(APawn* PossessPawn)
 {
 	SetHUD(WaitingHUDClass);
+	CarPossessPawn(PossessPawn);
 }
 
 void ACarPlayerController::ClientRaceStart_Implementation()
 {
 	SetHUD(GameHUDClass);
-	if(ACarPawn* player = Cast<ACarPawn>(GetPawn()))
-	{
-		player->SetFreezeMove(false);
-	}
-	
 }
 
 void ACarPlayerController::ClientRaceEnd_Implementation()

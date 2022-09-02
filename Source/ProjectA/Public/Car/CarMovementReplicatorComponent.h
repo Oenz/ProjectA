@@ -72,7 +72,7 @@ private:
 	UFUNCTION()
 		void OnRep_ServerState();
 
-	UFUNCTION(Server, Reliable, WithValidation)
+	UFUNCTION(Server, Reliable)//, WithValidation)
 		void Server_SendMove(FGoKartMove Move);
 
 	void AutonomousProxy_OnRep_ServerState();

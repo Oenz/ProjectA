@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "Online/CarPlayerState.h"
 #include "Online/RacingGameState.h"
 
 // Sets default values
@@ -15,6 +16,9 @@ AGoalArea::AGoalArea()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollider"));
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
+	MeshComponent->SetupAttachment(BoxCollider);
+	MeshComponent->SetCollisionProfileName("NoCollision");
 	BoxCollider->SetCollisionProfileName("OverlapAll");
 	BoxCollider->bMultiBodyOverlap = true;
 	BoxCollider->OnComponentBeginOverlap.AddDynamic(this, &AGoalArea::OnOverlapBegin);
@@ -24,23 +28,30 @@ void AGoalArea::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                const FHitResult& SweepResult)
 {
-	if (GEngine) 
+
+
+	if (!OtherActor->ActorHasTag(FName("Player"))) return;
+	
+	/*if (GEngine) 
 	{
 		FString str = FString::Printf(TEXT("overlap"));// FinishPlayerRanking[0]->GetName());
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, str);
-	}
+	}*/
 	if (!HasAuthority()) return;
 
-	if (!OtherActor->ActorHasTag(FName("Player"))) return;
+	
+	ACarPlayerState* PlayerState = Cast<APawn>(OtherActor)->GetPlayerState<ACarPlayerState>();
+	PlayerState->SetCheckPoint(CheckPointNumber);
+	
+	//GetWorld()->GetGameState<ARacingGameState>()->PlayerFinish(PlayerState);
+}
 
-	AController* controller = OtherActor->GetInstigatorController();
-	if(!IsValid(controller)) return;
-	ACarPlayerController* PlayerController = Cast<ACarPlayerController>(controller);
-	if (!IsValid(PlayerController)) return;
-	PlayerController->ClientRaceEnd();
-	ARacingGameState* GameState = GetWorld()->GetGameState<ARacingGameState>();
-	APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>();
-	GameState->FinishPlayerRanking.Add(PlayerState );
+void AGoalArea::SetVisiable(bool isVisiable)
+{
+	if(isVisiable == bVisiable) return;
+	//particle
+	bVisiable = isVisiable;
+	MeshComponent->SetVisibility(bVisiable);
 }
 
 // Called when the game starts or when spawned

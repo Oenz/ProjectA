@@ -20,4 +20,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnItemChanged();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnStan();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnEndStan();
 };

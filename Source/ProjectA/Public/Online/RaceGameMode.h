@@ -15,7 +15,7 @@ class PROJECTA_API ARaceGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 	public:
-	ARaceGameMode(const FObjectInitializer& ObjectInitializer);
+	ARaceGameMode();
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 

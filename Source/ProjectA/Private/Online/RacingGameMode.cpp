@@ -9,13 +9,18 @@
 #include "Catch2/catch.hpp"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Online/CarPlayerState.h"
 #include "Online/RacingGameState.h"
 
 ARacingGameMode::ARacingGameMode()
 {
 	DefaultPawnClass = nullptr;
-	RacingPawnClass = ACarPawn::StaticClass();
+	RacingPawnClass = TSoftClassPtr<ACarPawn>(
+		FSoftObjectPath(TEXT("/Game/Blueprint/BP_Car.BP_Car_C"))).LoadSynchronous();
+
+	
 	PlayerControllerClass = ACarPlayerController::StaticClass();
+	PlayerStateClass = ACarPlayerState::StaticClass();
 	SpectatorClass = ACarSpectatorPawn::StaticClass();
 	GameStateClass = ARacingGameState::StaticClass();
 
@@ -29,11 +34,6 @@ void ARacingGameMode::InitGame(const FString& MapName, const FString& Options, F
 
 	GameState = GetGameState<ARacingGameState>();
 
-}
-
-void ARacingGameMode::PreInitializeComponents()
-{
-	Super::PreInitializeComponents();
 }
 
 void ARacingGameMode::ReadyForStart()
@@ -52,9 +52,10 @@ void ARacingGameMode::ReadyForStart()
 		SpawnPram.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(RacingPawnClass, SpawnPos, FRotator::ZeroRotator,SpawnPram);
 
-		PlayerController->UnPossess();
-		PlayerController->Possess(SpawnedPawn);
-		Cast<ACarPlayerController>(PlayerController)->ClientGameStart();
+		if(ACarPlayerController* CarPlayerController = Cast<ACarPlayerController>(PlayerController))
+		{
+			CarPlayerController->CarPossessPawn(SpawnedPawn);
+		}
 	}
 }
 
@@ -102,17 +103,25 @@ void ARacingGameMode::StartTimer()
 
 void ARacingGameMode::RaceStart()
 {
-	GameState->SetTime(180);
+	GameState->SetTime(30);
+	bRaceStarted = true;
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ACarPlayerController* PlayerController = Cast<ACarPlayerController>(*Iterator);
 		PlayerController->ClientRaceStart();
+		if(ACarPawn* player = Cast<ACarPawn>(PlayerController->GetPawn()))
+		{
+			player->freezeMove = false;
+		}
+		
 	}
+	GetGameState<ARacingGameState>()->RaceStart();
 	//PC->ClientGameStart();
 }
 
 void ARacingGameMode::CountTimer()
 {
+	if(bRaceStarted) return;
 	GameState->RemainingTime--;
 
 	if(GameState->RemainingTime != 0) return;

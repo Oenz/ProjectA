@@ -5,10 +5,26 @@
 #include "DrawDebugHelpers.h"
 #include "Car/CarPawn.h"
 
+
+void ABombProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	FTimerHandle _timer;
+	GetWorldTimerManager().SetTimer(_timer, this, &ABombProjectile::Explosion, 1, false);
+}
+
 void ABombProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                             FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::OnHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
+
+	if(!HasAuthority()) return;
+	Explosion();
+}
+
+void ABombProjectile::Explosion()
+{
 	UE_LOG(LogTemp, Warning, TEXT("Explosion"));
 	DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 50, FColor::Purple, true, 3);
 	
@@ -24,10 +40,10 @@ void ABombProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		{
 			AActor* HitObject = hit.GetActor();
 			if(HitObject == nullptr) break;
-			if (GEngine) 
+			/*if (GEngine) 
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Hit Result: %s"), *HitObject->GetName()));
-			}
+			}*/
 
 			if(ACarPawn* Player =  Cast<ACarPawn>(HitObject))
 			{
@@ -36,4 +52,5 @@ void ABombProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 			}
 		}
 	}
+	Destroy();
 }

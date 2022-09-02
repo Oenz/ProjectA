@@ -4,6 +4,7 @@
 #include "UI/LobbyWidget.h"
 
 #include "Components/Button.h"
+#include "Components/EditableTextBox.h"
 
 void ULobbyWidget::NativeConstruct()
 {
@@ -15,10 +16,10 @@ void ULobbyWidget::NativeConstruct()
 
 void ULobbyWidget::Matching()
 {
-	FString command = "open 127.0.0.1";
+	FString command = "open " + TextBox->GetText().ToString();
 	GetOwningPlayer()->ConsoleCommand(*command, true);
-	if (GEngine) 
+	/*if (GEngine) 
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, *command);
-	}
+	}*/
 }

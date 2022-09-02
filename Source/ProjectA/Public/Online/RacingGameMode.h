@@ -18,8 +18,6 @@ class PROJECTA_API ARacingGameMode : public AGameMode
 	ARacingGameMode();
 	
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-
-	virtual void PreInitializeComponents() override;
 	
     void ReadyForStart();
 
@@ -42,12 +40,13 @@ public:
 
 	void RaceStart();
 
+	bool bRaceStarted = false;
 	
 	FTimerHandle TimerHandle;
 
 	void CountTimer();
 
-	int32 WaitingForStartTime = 3;
+	int32 WaitingForStartTime = 10;
 
 	int32 WaitingForRaceTime = 5;
 };

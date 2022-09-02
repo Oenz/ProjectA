@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Buttons", meta = (BindWidget))
 	class UButton* MatchingButton;
 
+	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Text", meta = (BindWidget))
+	class UEditableTextBox* TextBox;
+
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()

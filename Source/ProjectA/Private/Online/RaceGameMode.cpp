@@ -6,7 +6,7 @@
 #include "Car/CarPlayerController.h"
 
 
-ARaceGameMode::ARaceGameMode(const FObjectInitializer& ObjectInitializer)
+ARaceGameMode::ARaceGameMode()
 {
 	DefaultPawnClass = ACarPawn::StaticClass();
 	PlayerControllerClass = ACarPlayerController::StaticClass();

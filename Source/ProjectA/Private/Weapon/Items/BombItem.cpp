@@ -9,14 +9,12 @@
 
 ABombItem::ABombItem()
 {
-	BombProjectile = TSoftClassPtr<AProjectile>(
-		FSoftObjectPath(TEXT("/Game/Blueprint/BP_BombProjectile.BP_BombProjectile_C"))).LoadSynchronous();
 
 }
 
-void ABombItem::UseItem(EBlendType type)
+void ABombItem::UseItem()
 {
-	Super::UseItem(type);
+	Super::UseItem();
 	UE_LOG(LogTemp, Warning, TEXT("USE"));
 	TArray<AActor*> AttachedActors;
 	GetOwner()->GetAttachedActors(AttachedActors);
@@ -32,8 +30,9 @@ void ABombItem::UseItem(EBlendType type)
 		
 	}
 	if(ProjectileLauncher == nullptr) return;
-	AProjectile* Projectile = ProjectileLauncher->FireProjectile(BombProjectile);
-	if(Projectile == nullptr)
+	 ProjectileLauncher->ClientBombFire();
+	//AProjectile* Projectile =
+	/*if(Projectile == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("BombProjectile NULL"));
 		return;
@@ -52,7 +51,7 @@ void ABombItem::UseItem(EBlendType type)
 		break;
 	default:
 		break;
-	}
+	}*/
 	Destroy();
 }
 

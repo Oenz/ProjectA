@@ -53,15 +53,20 @@ public:
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	//class UStaticMesh* Projectile;
 
+	UPROPERTY(Replicated)
 	class AProjectileLauncher* ProjectileLauncher;
 	
-	TSubclassOf<AProjectile> Projectile;
+
 	
 	void Stan(float second);
+	void EndStan();
+	
 
-	bool freezeMove = false;
+	UPROPERTY(ReplicatedUsing=OnRep_FreezeMove)
+	bool freezeMove = true;
 
-	void SetFreezeMove(bool isFreeze);
+	UFUNCTION()
+	void OnRep_FreezeMove();
 	
 private://Controllerに移行
 	void MoveForward(float Value);
@@ -70,11 +75,13 @@ private://Controllerに移行
 
 	void MoveUp(float Value);
 
-	void Fire();
+	void StartFire();
+
+	void StopFire();
 	
 	void Use();
 
 	void SwitchBlend();
 
-	void EndStan();
+	bool UsingController();
 };

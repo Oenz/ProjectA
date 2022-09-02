@@ -21,9 +21,19 @@ public:
 	UPROPERTY(Transient, Replicated, ReplicatedUsing=OnRep_TimeChanged, BlueprintReadOnly)
 	int32 RemainingTime;
 
-	UPROPERTY(Transient, Replicated, ReplicatedUsing=OnRep_FinishPlayerRanking, BlueprintReadOnly)
+	UPROPERTY(Transient, Replicated)
+	TArray<APlayerState*> PlayerRanking;
+	
 	TArray<APlayerState*> FinishPlayerRanking;
+	
+	TArray<class ACarPlayerState*> PlayerList;
 
+	void PlayerFinish(class APlayerState* Player);
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	void RaceStart();
+	
 	UFUNCTION()
 	void OnRep_TimeChanged();
 
@@ -32,5 +42,5 @@ public:
 
 	FTimeChangedDelegate TimeChangedDelegate;
 
-	void SetTime(int32 time) {RemainingTime = time;};
+	void SetTime(int32 time) { RemainingTime = time; };
 };

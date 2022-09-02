@@ -18,9 +18,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBoxComponent* BoxCollider;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* MeshComponent;
+
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int CheckPointNumber = 1;
+
+	void SetVisiable(bool isVisiable);
+	
+	bool bVisiable = true;
 	
 protected:
 	// Called when the game starts or when spawned

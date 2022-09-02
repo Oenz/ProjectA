@@ -3,25 +3,35 @@
 
 #include "Weapon/ProjectileLauncher.h"
 
+#include "Car/InventoryComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Weapon/Projectile.h"
+#include "Net/UnrealNetwork.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AProjectileLauncher::AProjectileLauncher()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 0.1f;
+	bReplicates = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	UStaticMesh* LoadBody = LoadObject<UStaticMesh>(NULL, TEXT("/Game/Assets/StarterContent/Shapes/Shape_TriPyramid.Shape_TriPyramid"), NULL, LOAD_None, NULL);
-	Mesh->SetStaticMesh(LoadBody);
+	//UStaticMesh* LoadBody = LoadObject<UStaticMesh>(
+	//	NULL, TEXT("/Game/Assets/StarterContent/Shapes/Shape_TriPyramid.Shape_TriPyramid"), NULL, LOAD_None, NULL);
+	//Mesh->SetStaticMesh(LoadBody);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	DefaultProjectile = TSoftClassPtr<AProjectile>(
+		FSoftObjectPath(TEXT("/Game/Blueprint/BP_Projectile.BP_Projectile_C"))).LoadSynchronous();
+	BombProjectile = TSoftClassPtr<AProjectile>(
+		FSoftObjectPath(TEXT("/Game/Blueprint/BP_BombProjectile.BP_BombProjectile_C"))).LoadSynchronous();
 }
 
 // Called when the game starts or when spawned
 void AProjectileLauncher::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -29,25 +39,77 @@ void AProjectileLauncher::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	GetCursorFirePosition();
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner()->GetName());
-
 }
 
-AProjectile* AProjectileLauncher::FireProjectile( TSubclassOf< AProjectile > ProjectileObject )
+void AProjectileLauncher::FireProjectile(TSubclassOf<AProjectile> ProjectileObject, FVector CursourPosition)
 {
-	FVector SpawnPos = GetActorLocation();// + GetActorForwardVector() * 100;
-	AProjectile* SpawnProjectile =  GetWorld()->SpawnActor<AProjectile>(ProjectileObject, SpawnPos, GetActorRotation());
-	SpawnProjectile->SetOwner(GetOwner());
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if(PlayerController == nullptr) return nullptr;
-	FVector mouseLocation, mouseDirection;
-	//GetWorld()->GetFirstPlayerController();
-	PlayerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+	if (!HasAuthority()) return;
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("FirePrj")));
 
-	FVector EndPoint = mouseLocation + mouseDirection * 10000;
-	FVector FireDirection = EndPoint - SpawnPos;
+	FVector SpawnPos = GetActorLocation();
+	UInventoryComponent* inv = Cast<UInventoryComponent>(
+		GetOwner()->GetComponentByClass(UInventoryComponent::StaticClass()));
+	FTransform spawnTfm(GetActorRotation(), SpawnPos);
+	AProjectile* SpawnProjectile = Cast<AProjectile>(
+		UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), ProjectileObject, spawnTfm));
+	if (SpawnProjectile)
+	{
+		//Projectile->GetInstigator();
+		SpawnProjectile->SetOwner(GetOwner());
+		if (inv->BlendType == EBlendType::Speed) SpawnProjectile->SpeedUp();
+		UGameplayStatics::FinishSpawningActor(SpawnProjectile, spawnTfm);
+	}
+
+	FVector FireDirection = CursourPosition - SpawnPos;
 	FireDirection.Normalize();
 	SpawnProjectile->FireInDirection(FireDirection);
-	return SpawnProjectile;
+
+	switch (inv->BlendType)
+	{
+		case EBlendType::Range:
+			SpawnProjectile->RangeUp();
+			break;
+		case EBlendType::Power:
+			SpawnProjectile->PowerUp();
+			break;
+		default:
+			break;
+	}
 }
 
+FVector AProjectileLauncher::GetCursorFirePosition()
+{
+	if (HasAuthority()) return FVector::Zero();
+	FVector mouseLocation, mouseDirection;
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	PlayerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+	return mouseLocation + mouseDirection * 10000;
+}
+
+void AProjectileLauncher::StartDefaultFire()
+{
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("ServerFire")));
+	float FirstDelay = FMath::Max(LastFireTime + FireRate - GetWorld()->TimeSeconds, 0.0f);
+	GetWorldTimerManager().SetTimer(DefaultFireTimer, [&]()
+	{
+		ServerFireProjectile(GetCursorFirePosition(), false);
+		LastFireTime = GetWorld()->TimeSeconds;
+	}, FireRate, true, FirstDelay);
+}
+
+void AProjectileLauncher::StopDefaultFire()
+{
+	GetWorldTimerManager().ClearTimer(DefaultFireTimer);
+}
+
+void AProjectileLauncher::ClientBombFire_Implementation()
+{
+	ServerFireProjectile(GetCursorFirePosition(), true);
+}
+
+void AProjectileLauncher::ServerFireProjectile_Implementation(FVector TargetPos, bool isBomb)
+{
+	FireProjectile(isBomb ? BombProjectile : DefaultProjectile, TargetPos);
+}

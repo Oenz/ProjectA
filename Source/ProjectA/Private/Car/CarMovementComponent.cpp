@@ -39,9 +39,9 @@ void UCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UCarMovementComponent::SimulateMove(const FGoKartMove& Move)
 {
-	FVector ForwardForce = GetOwner()->GetActorForwardVector() * MaxDrivingForce * Move.Throttle;
-	FVector UpForce = GetOwner()->GetActorUpVector() * MaxClimbForce * Move.Pitch;
-	FVector Force = ForwardForce + UpForce;
+	FVector Force = GetOwner()->GetActorForwardVector() * MaxDrivingForce * Move.Throttle;
+	//FVector UpForce = GetOwner()->GetActorUpVector() * MaxClimbForce * Move.Pitch;
+	//FVector Force = ForwardForce + UpForce;
 	//Force += FVector::DownVector * -GetWorld()->GetGravityZ();
 	Force += GetAirResistance();
 	Force += GetRollingResistance();
@@ -50,7 +50,8 @@ void UCarMovementComponent::SimulateMove(const FGoKartMove& Move)
 
 	Velocity = Velocity + Acceleration * Move.DeltaTime;
 
-	ApplyRotation(Move.DeltaTime, Move.SteeringThrow);
+	ApplyRotation(Move.DeltaTime, Move.SteeringThrow, GetOwner()->GetActorForwardVector());
+	ApplyRotation(Move.DeltaTime, Move.Pitch, GetOwner()->GetActorRightVector());
 	UpdateLocationFromVelocity(Move.DeltaTime);
 }
 
@@ -78,15 +79,24 @@ FVector UCarMovementComponent::GetRollingResistance()
 	return -Velocity.GetSafeNormal() * RollingResistanceCoefficient * NormalForce;
 }
 
-void UCarMovementComponent::ApplyRotation(float DeltaTime, float m_SteeringThrow)
+void UCarMovementComponent::ApplyRotation(float DeltaTime, float m_SteeringThrow, FVector direction)
 {
-	float DeltaLocation = FVector::DotProduct(GetOwner()->GetActorForwardVector(), Velocity) * DeltaTime;
+	/*float DeltaLocation = FVector::DotProduct(GetOwner()->GetActorForwardVector(), Velocity) * DeltaTime;
 	float RotationAngle = DeltaLocation / MinTurningRadius * m_SteeringThrow;
 	FQuat RotationDelta(GetOwner()->GetActorUpVector(), RotationAngle);
 
 	Velocity = RotationDelta.RotateVector(Velocity);
 
+	GetOwner()->AddActorWorldRotation(RotationDelta);*/
+
+	//FQuat RotationDelta(GetOwner()->GetActorRightVector(), 0.1f); //up down
+	FQuat RotationDelta(-direction, MinTurningRadius * Velocity.Size() * m_SteeringThrow * DeltaTime);
 	GetOwner()->AddActorWorldRotation(RotationDelta);
+	
+	//GetOwner()->AddActorWorldRotation(FRotator(5,0,0));
+
+
+	
 }
 
 void UCarMovementComponent::UpdateLocationFromVelocity(float DeltaTime)

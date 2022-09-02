@@ -23,8 +23,11 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_CurrentItem)
 	class AItemBase* CurrentItem;
+
+	UFUNCTION()
+	void OnRep_CurrentItem();
 	
 protected:
 	// Called when the game starts
@@ -34,6 +37,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(Server, Reliable)
 	void UseCurrentItem();
 
 	void EquipItem(class AItemBase* item);
@@ -42,4 +46,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EBlendType BlendType;
+
+	UFUNCTION(Unreliable, Server)
+	void ServerSetBlendType(int type);
 };

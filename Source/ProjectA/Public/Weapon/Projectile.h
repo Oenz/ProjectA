@@ -52,4 +52,6 @@ public:
 
 	UFUNCTION()
 	virtual  void PowerUp();
+
+	float stanTime = 3;
 };

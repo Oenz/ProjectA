@@ -24,6 +24,8 @@ public:
 	TSubclassOf<class UUserWidget> GoalHUDClass;
 
 	UUserWidget* HUD;
+
+	UUserWidget* GetHUD() {return HUD;};
 	
 	virtual void BeginPlay() override;
 
@@ -36,8 +38,10 @@ public:
 
 	void OnItemChange();
 
+	void CarPossessPawn(APawn* PossessPawn);
+	
 	UFUNCTION(Reliable, Client)
-	void ClientGameStart();
+	void ClientGameStart(APawn* PossessPawn);
 	
 	UFUNCTION(Reliable, Client)
 	void ClientRaceStart();
