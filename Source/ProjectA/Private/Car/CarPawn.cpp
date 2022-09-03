@@ -133,7 +133,9 @@ void ACarPawn::MoveForward(float Value)
 	if(freezeMove) return;
 	if (MovementComponent == nullptr) return;
 
-	MovementComponent->SetThrottle(Value);
+	ForwardValue = Value;
+	MovementComponent->SetThrottle(ForwardValue);
+	
 }
 
 void ACarPawn::MoveRight(float Value)
@@ -141,9 +143,16 @@ void ACarPawn::MoveRight(float Value)
 	if(freezeMove) return;
 	if (MovementComponent == nullptr) return;
 
-	if(UsingController()) MovementComponent->SetSteeringThrow(Value - 1.0f);
-	else MovementComponent->SetSteeringThrow(Value);
-	
+	if(UsingController())
+	{
+		RightValue =  Value - 1.0f;
+	}
+	else
+	{
+		RightValue = Value;
+	}
+
+	MovementComponent->SetSteeringThrow(RightValue);
 	
 }
 
@@ -152,8 +161,9 @@ void ACarPawn::MoveUp(float Value)
 	if(freezeMove) return;
 	if(MovementComponent == nullptr) return;
 	
-	if(UsingController())  MovementComponent->SetPitch(Value -1.0f);
-	else MovementComponent->SetPitch(Value);
+	if(UsingController()) UpValue = Value -1.0f ;
+	else UpValue = Value;
+	MovementComponent->SetPitch(UpValue);
 }
 
 void ACarPawn::StartFire()

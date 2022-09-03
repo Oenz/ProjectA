@@ -67,6 +67,15 @@ public:
 
 	UFUNCTION()
 	void OnRep_FreezeMove();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ForwardValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float RightValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float UpValue;
 	
 private://Controllerに移行
 	void MoveForward(float Value);
