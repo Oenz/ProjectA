@@ -85,7 +85,7 @@ FVector AProjectileLauncher::GetCursorFirePosition()
 	FVector mouseLocation, mouseDirection;
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	PlayerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
-	return mouseLocation + mouseDirection * 10000;
+	return mouseLocation + mouseDirection * 100000;
 }
 
 void AProjectileLauncher::StartDefaultFire()

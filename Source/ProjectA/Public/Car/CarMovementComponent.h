@@ -70,7 +70,7 @@ private:
 	float RollingResistanceCoefficient = 0.015;
 
 	UPROPERTY(EditAnywhere)
-	float MaxDrivingForce = 10000;
+	float MaxDrivingForce = 100000;
 
 	UPROPERTY(EditAnywhere)
 	float MaxClimbForce = 1000;

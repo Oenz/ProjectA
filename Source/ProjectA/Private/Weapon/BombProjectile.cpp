@@ -4,14 +4,17 @@
 #include "Weapon/BombProjectile.h"
 #include "DrawDebugHelpers.h"
 #include "Car/CarPawn.h"
+#include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
 void ABombProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FTimerHandle _timer;
-	GetWorldTimerManager().SetTimer(_timer, this, &ABombProjectile::Explosion, 1, false);
+
+	GetWorldTimerManager().SetTimer(_timer, this, &ABombProjectile::Explosion, lifetime, false);
 }
 
 void ABombProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -26,8 +29,16 @@ void ABombProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 void ABombProjectile::Explosion()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Explosion"));
-	DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 50, FColor::Purple, true, 3);
-	
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 50, FColor::Purple, true, 3);
+
+	CollisionComponent->SetCollisionProfileName("NoCollision");
+	GetWorld()->GetTimerManager().ClearTimer(_timer);
+	/*if(ExplosionParticle != nullptr)
+	{
+		UParticleSystemComponent* _PSC = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle,GetActorLocation(), FRotator::ZeroRotator, FVector::One() *	ParticleScale, true);
+		_PSC->SetIsReplicated(true);
+	}*/
+	ParticleScale = ExplosionRadius;
 	TArray<FHitResult> OutHits;
 	// check if something got hit in the sweep
 	FCollisionShape MyColSphere = FCollisionShape::MakeSphere(ExplosionRadius);
@@ -52,5 +63,12 @@ void ABombProjectile::Explosion()
 			}
 		}
 	}
-	Destroy();
+	SetLifeSpan(lifetime);
+}
+
+void ABombProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABombProjectile, ParticleScale);
 }

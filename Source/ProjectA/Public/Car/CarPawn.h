@@ -55,14 +55,24 @@ public:
 
 	UPROPERTY(Replicated)
 	class AProjectileLauncher* ProjectileLauncher;
-	
 
-	
+	bool gamestart = false;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnRaceStart();
+
+	UFUNCTION(BlueprintCallable)
 	void Stan(float second);
 	void EndStan();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnStan();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnEndStan();
 	
 
-	UPROPERTY(ReplicatedUsing=OnRep_FreezeMove)
+	UPROPERTY(ReplicatedUsing=OnRep_FreezeMove, EditAnywhere, BlueprintReadOnly)
 	bool freezeMove = true;
 
 	UFUNCTION()

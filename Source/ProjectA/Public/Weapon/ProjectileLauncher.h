@@ -34,7 +34,7 @@ public:
 
 	FTimerHandle DefaultFireTimer;
 
-	float FireRate = 0.5f;
+	float FireRate = 0.3f;
 
 	float LastFireTime = 0.0f;
 	

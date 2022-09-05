@@ -11,6 +11,7 @@ class UHUDWidget;
 
 ACarPlayerController::ACarPlayerController()
 {
+	SpectorHUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_SpectorHUD.WBP_SpectorHUD_C"))).LoadSynchronous();
 	GameHUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_GameHUD.WBP_GameHUD_C"))).LoadSynchronous();
 	WaitingHUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_WaitingHUD.WBP_WaitingHUD_C"))).LoadSynchronous();
 	GoalHUDClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(TEXT("/Game/Widget/WBP_GoalHUD.WBP_GoalHUD_C"))).LoadSynchronous();
@@ -21,6 +22,7 @@ void ACarPlayerController::BeginPlay()
 	Super::BeginPlay();
 	SetInputMode(FInputModeUIOnly());
 	this->bShowMouseCursor = true;
+	SetHUD(SpectorHUDClass);
 }
 
 void ACarPlayerController::SetupInputComponent()

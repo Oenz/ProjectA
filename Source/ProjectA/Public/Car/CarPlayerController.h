@@ -17,6 +17,8 @@ class PROJECTA_API ACarPlayerController : public APlayerController
 public:
 	ACarPlayerController();
 
+	TSubclassOf<class UUserWidget> SpectorHUDClass;
+	
 	TSubclassOf<class UUserWidget> GameHUDClass;
 
 	TSubclassOf<class UUserWidget> WaitingHUDClass;

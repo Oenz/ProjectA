@@ -15,19 +15,32 @@ class PROJECTA_API ABombProjectile : public AProjectile
 	GENERATED_BODY()
 	
 public:
+	FTimerHandle _timer;
+	
 	virtual void BeginPlay() override;
 	
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
+	UFUNCTION(BlueprintCallable)
 	void Explosion();
 	
 	virtual void RangeUp() override { ExplosionRadius *= 2;};
 
 	virtual void PowerUp() override {StanTime *= 2;}
 
-private:
-//ぱーてぃくるをれぷりけーと
-	float ExplosionRadius = 1000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ExplosionRadius = 50000;
 
-	float StanTime = 3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float lifetime = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnExplosion)
+	float ParticleScale = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float StanTime = 7;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnExplosion();
+
 };

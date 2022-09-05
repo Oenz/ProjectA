@@ -67,12 +67,19 @@ void ACarPlayerState::BeginPlay()
 	TArray<AActor*> actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGoalArea::StaticClass(), actors);
 
+	goals.Reset();
 	
 	for (AActor* actor : actors)
 	{
-		AGoalArea* goal = Cast<AGoalArea>(actor);
-		goals.EmplaceAt(goal->CheckPointNumber -1, goal);
+		if(AGoalArea* goal = CastChecked<AGoalArea>(actor))
+		{
+			goals.Add(goal);
+			//goals.EmplaceAt(goal->CheckPointNumber -1, goal);
+		}
 	}
+	goals.Sort([](const AGoalArea& A, const AGoalArea& B) {
+	return A.CheckPointNumber < B.CheckPointNumber;
+	});
 	
 	OnRep_CurrentCheckPoint();
 }

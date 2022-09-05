@@ -51,7 +51,7 @@ ACarPawn::ACarPawn()
 
 	//BoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	//BoxCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Block);
-	BoxCollider->SetCollisionProfileName("BlockAll");
+	BoxCollider->SetCollisionProfileName("NoCollision");
 	//BoxCollider->SetHiddenInGame(false);
 	BoxCollider->SetBoxExtent(FVector(230, 90, 80));
 	BoxCollider->SetGenerateOverlapEvents(true);
@@ -74,7 +74,7 @@ void ACarPawn::BeginPlay()
 		ProjectileLauncher->SetActorRelativeLocation(GetActorForwardVector() * 2000);//
 		ProjectileLauncher->SetOwner(this);
 		
-		NetUpdateFrequency = 20;
+		NetUpdateFrequency = 10;
 	}
 
 	freezeMove = true;
@@ -202,6 +202,7 @@ bool ACarPawn::UsingController()
 void ACarPawn::Stan(float second)
 {
 	if(!HasAuthority()) return;
+	if(freezeMove) return;
 	FTimerHandle _TimerHandle;
 
 	freezeMove = true;
@@ -230,13 +231,19 @@ void ACarPawn::OnRep_FreezeMove()
 		MovementComponent->SetThrottle(0);
 		MovementComponent->SetSteeringThrow(0);
 		MovementComponent->SetPitch(0);
-
+		OnStan();
 
 		
 		//DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Red, true, 5);
 	}
 	else
 	{
+		OnEndStan();
+		if(!gamestart)
+		{
+			OnRaceStart();
+			gamestart = true;
+		}
 		//DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Green, true, 1);
 	}
 
