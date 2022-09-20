@@ -2,10 +2,12 @@
 
 
 #include "Car/CarPlayerController.h"
-
+#include "Online/CarPlayerState.h"
 #include "Blueprint/UserWidget.h"
 #include "Car/CarPawn.h"
 #include "UI/HUDWidget.h"
+#include "Online/RacingGameMode.h"
+#include "UI/SpectorWidget.h"
 
 class UHUDWidget;
 
@@ -20,7 +22,7 @@ ACarPlayerController::ACarPlayerController()
 void ACarPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	SetInputMode(FInputModeUIOnly());
+	SetInputMode(FInputModeGameOnly());
 	this->bShowMouseCursor = true;
 	SetHUD(SpectorHUDClass);
 }
@@ -28,8 +30,22 @@ void ACarPlayerController::BeginPlay()
 void ACarPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+	InputComponent->BindAction("Ready", IE_Pressed,this, &ACarPlayerController::Ready);
+}
 
-	//InputComponent->BindAction("SwitchBlend", IE_Pressed, this, &ACarPlayerController::SwitchBlend);
+void ACarPlayerController::Ready()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Ready"));
+	ACarPlayerState* CPS = GetPlayerState<ACarPlayerState>();
+	if (!IsValidChecked(CPS)) return;
+	CPS->ServerPlayerReady(!CPS->isReady);
+	CPS->isReady = !CPS->isReady;
+	if(USpectorWidget* SpectorWidget = Cast<USpectorWidget>(GetHUD()))
+	{
+		if(SpectorWidget == nullptr) return;
+		SpectorWidget->OnReadyChange(CPS->isReady);
+	}
+	
 }
 
 void ACarPlayerController::SetHUD(TSubclassOf<UUserWidget> HUDClass)

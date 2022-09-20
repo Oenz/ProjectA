@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Online/RacingGameState.h"
+#include "Online/RacingGameMode.h"
 
 bool ACarPlayerState::SetCheckPoint(int num)
 {
@@ -16,7 +17,9 @@ bool ACarPlayerState::SetCheckPoint(int num)
 
 	if (CurrentCheckPoint >= goals.Num())
 	{
+		isGoal = true;
 		GetWorld()->GetGameState<ARacingGameState>()->PlayerFinish(this);
+		
 	}
 
 	return true;
@@ -57,6 +60,13 @@ void ACarPlayerState::GetDistance()
 	if(!HasAuthority()) return;
 	ARacingGameState* GameState = GetWorld()->GetGameState<ARacingGameState>();
 	Ranking = GameState->PlayerRanking.Find(this) + 1;
+}
+
+void ACarPlayerState::ServerPlayerReady_Implementation(bool ready)
+{
+	isReady = ready;
+	ARacingGameMode* GameState = Cast<ARacingGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameState->CheckAllPlayersReady();
 }
 
 

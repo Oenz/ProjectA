@@ -25,6 +25,15 @@ void ARacingGameState::PlayerFinish(APlayerState* Player)
 	FinishPlayerRanking.Add(Player);
 
 	PlayerList.Remove(Cast<ACarPlayerState>(Player));
+
+	for(APlayerState* ps : PlayerArray)
+	{
+		if(ACarPlayerState* cps = Cast<ACarPlayerState>(ps))
+		{
+			if(!cps->isGoal) return;
+		}
+	}
+	UGameplayStatics::OpenLevel(this, GetWorld()->GetFName(), false);
 }
 
 void ARacingGameState::Tick(float DeltaSeconds)

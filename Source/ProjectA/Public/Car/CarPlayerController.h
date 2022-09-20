@@ -35,6 +35,8 @@ public:
 
 	void SetHUD(TSubclassOf<class UUserWidget> HUDClass);
 	
+	void Ready();
+	
 	UFUNCTION()
 	void OnSwitchBlend();
 

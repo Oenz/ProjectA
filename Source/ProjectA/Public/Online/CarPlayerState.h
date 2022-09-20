@@ -39,4 +39,11 @@ public:
 	void OnRep_Ranking();
 	
 	void GetDistance();
+
+	UFUNCTION(Reliable, Server)
+		void ServerPlayerReady(bool ready);
+
+	bool isReady = false;
+
+	bool isGoal = false;
 };

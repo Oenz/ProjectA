@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/SpectatorPawn.h"
-#include "CarSpectatorPawn.generated.h"
+#include "Blueprint/UserWidget.h"
+#include "WatingWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTA_API ACarSpectatorPawn : public ASpectatorPawn
+class PROJECTA_API UWatingWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 };

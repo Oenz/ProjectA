@@ -69,12 +69,35 @@ void ARacingGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	if (GetMatchState() == MatchState::WaitingToStart && NumPlayers == 1)
+	//if (GetMatchState() == MatchState::WaitingToStart && NumPlayers == 1)
+	//{
+	//	GameState = GetGameState<ARacingGameState>();
+	//	GameState->SetTime(WaitingForStartTime);
+	//	StartTimer();
+	//}
+}
+
+void ARacingGameMode::CheckAllPlayersReady()
+{
+	if(GetMatchState() != MatchState::WaitingToStart) return;
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(*Iterator);
+		ACarPlayerState* PlayerState = Cast<ACarPlayerState>(PlayerController->PlayerState);
+		if (!PlayerState->isReady)
+		{
+			StopTimer();
+			return;
+		}
+	}
+
+	if (GetMatchState() == MatchState::WaitingToStart && !GetWorld()->GetTimerManager().IsTimerActive(TimerHandle))
 	{
 		GameState = GetGameState<ARacingGameState>();
 		GameState->SetTime(WaitingForStartTime);
 		StartTimer();
 	}
+
 }
 
 void ARacingGameMode::Logout(AController* Exiting)
@@ -99,6 +122,11 @@ void ARacingGameMode::HandleMatchHasStarted()
 void ARacingGameMode::StartTimer()
 {
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ARacingGameMode::CountTimer, 1, true);
+}
+
+void ARacingGameMode::StopTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 
 void ARacingGameMode::RaceStart()

@@ -38,6 +38,8 @@ public:
 
 	void StartTimer();
 
+	void StopTimer();
+
 	void RaceStart();
 
 	bool bRaceStarted = false;
@@ -49,4 +51,6 @@ public:
 	int32 WaitingForStartTime = 15;
 
 	int32 WaitingForRaceTime = 7;
+
+	void CheckAllPlayersReady();
 };
