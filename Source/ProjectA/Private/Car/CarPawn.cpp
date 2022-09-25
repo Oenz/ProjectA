@@ -33,12 +33,13 @@ ACarPawn::ACarPawn()
 	MovementComponent = CreateDefaultSubobject<UCarMovementComponent>(TEXT("MovementComponent"));
 	MovementReplicatorComponent = CreateDefaultSubobject<UCarMovementReplicatorComponent>(TEXT("MovementReplicator"));
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
+	CameraTarget = CreateDefaultSubobject<USceneComponent>(TEXT("CameraTarget"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	
 	//RootComponent = DefaultSceneRoot;
 	DefaultSceneRoot->SetupAttachment(BoxCollider);
 	BodyMesh->SetupAttachment(DefaultSceneRoot);
-	CameraComponent->SetupAttachment(BodyMesh);
+	
 
 	//USkeletalMesh* LoadBody = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
 	USkeletalMesh* LoadBody = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Assets/VigilanteContent/Vehicles/East_Fighter_Su33/SK_East_Fighter_Su33.SK_East_Fighter_Su33"), NULL, LOAD_None, NULL);
@@ -46,8 +47,9 @@ ACarPawn::ACarPawn()
 
 	//BodyMesh->SetRelativeScale3D(FVector(0.25f,0.25f,0.25f));
 
-	CameraComponent->SetRelativeLocation(FVector(-1800,0,750));
-	CameraComponent->SetRelativeRotation(FRotator(0, 0, 0));
+	CameraTarget->SetupAttachment(BodyMesh);
+	CameraTarget->SetRelativeLocation(FVector(-1800,0,750));
+	CameraTarget->SetRelativeRotation(FRotator(0, 0, 0));
 
 	//BoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	//BoxCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Block);
@@ -126,6 +128,11 @@ void ACarPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Fire", IE_Released,this, &ACarPawn::StopFire);
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ACarPawn::Use);
 	PlayerInputComponent->BindAction("SwitchBlend", IE_Pressed, this, &ACarPawn::SwitchBlend);
+}
+
+void ACarPawn::ClientViewTargetChange_Implementation()
+{
+	OnViewTargetChange();
 }
 
 void ACarPawn::MoveForward(float Value)
@@ -231,7 +238,7 @@ void ACarPawn::OnRep_FreezeMove()
 		MovementComponent->SetThrottle(0);
 		MovementComponent->SetSteeringThrow(0);
 		MovementComponent->SetPitch(0);
-		OnStan();
+		if(!isGoal)OnStan();
 
 		
 		//DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Red, true, 5);
@@ -263,4 +270,5 @@ void ACarPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifet
 	
 	DOREPLIFETIME_CONDITION(ACarPawn, ProjectileLauncher, COND_OwnerOnly);
 	DOREPLIFETIME(ACarPawn, freezeMove);
+	DOREPLIFETIME(ACarPawn, isGoal);
 }

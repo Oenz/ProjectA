@@ -17,7 +17,10 @@ class PROJECTA_API ULobbyWidget : public UUserWidget
 public:
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Buttons", meta = (BindWidget))
 	class UButton* MatchingButton;
-
+	
+	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Buttons", meta = (BindWidget))
+    	class UButton* AutoMatchingButton;
+	
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite, Category = "Text", meta = (BindWidget))
 	class UEditableTextBox* TextBox;
 
@@ -25,4 +28,7 @@ public:
 
 	UFUNCTION()
 	void Matching();
+
+	UFUNCTION()
+	void AutoMatching();
 };

@@ -103,6 +103,7 @@ void ARacingGameMode::CheckAllPlayersReady()
 void ARacingGameMode::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
+	UGameplayStatics::OpenLevel(this, GetWorld()->GetFName(), false);
 }
 
 void ARacingGameMode::HandleMatchIsWaitingToStart()

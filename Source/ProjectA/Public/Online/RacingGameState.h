@@ -21,7 +21,7 @@ public:
 	UPROPERTY(Transient, Replicated, ReplicatedUsing=OnRep_TimeChanged, BlueprintReadOnly)
 	int32 RemainingTime;
 
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(Transient, Replicated, BlueprintReadOnly)
 	TArray<APlayerState*> PlayerRanking;
 	
 	TArray<APlayerState*> FinishPlayerRanking;

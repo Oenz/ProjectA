@@ -44,6 +44,6 @@ public:
 		void ServerPlayerReady(bool ready);
 
 	bool isReady = false;
-
+	
 	bool isGoal = false;
 };

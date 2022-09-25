@@ -5,11 +5,14 @@
 
 #include <string>
 
+#include "Car/CarPawn.h"
 #include "Car/CarPlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Online/CarPlayerState.h"
+
+class ACarPawn;
 
 ARacingGameState::ARacingGameState()
 {
@@ -26,14 +29,32 @@ void ARacingGameState::PlayerFinish(APlayerState* Player)
 
 	PlayerList.Remove(Cast<ACarPlayerState>(Player));
 
+
+	bool allplayergoal = true;
 	for(APlayerState* ps : PlayerArray)
 	{
 		if(ACarPlayerState* cps = Cast<ACarPlayerState>(ps))
 		{
-			if(!cps->isGoal) return;
+			if(cps->isGoal)
+			{
+				if(ACarPawn* car = cps->GetPawn<ACarPawn>())
+				{
+					car->ClientViewTargetChange();
+				}
+			}
+			else
+			{
+				allplayergoal = false;
+			}
 		}
 	}
-	UGameplayStatics::OpenLevel(this, GetWorld()->GetFName(), false);
+	if(!allplayergoal) return;
+	FTimerHandle goal;
+	GetWorld()->GetTimerManager().SetTimer(goal, [&]()
+	{
+		UGameplayStatics::OpenLevel(this, GetWorld()->GetFName(), false);
+	}, 5, true);
+	
 }
 
 void ARacingGameState::Tick(float DeltaSeconds)

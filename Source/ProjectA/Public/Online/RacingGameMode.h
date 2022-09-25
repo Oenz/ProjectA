@@ -48,7 +48,7 @@ public:
 
 	void CountTimer();
 
-	int32 WaitingForStartTime = 15;
+	int32 WaitingForStartTime = 5;
 
 	int32 WaitingForRaceTime = 7;
 

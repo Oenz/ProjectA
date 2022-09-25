@@ -3,6 +3,7 @@
 
 #include "Online/CarPlayerState.h"
 
+#include "Car/CarPawn.h"
 #include "Gimic/GoalArea.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -19,9 +20,16 @@ bool ACarPlayerState::SetCheckPoint(int num)
 	{
 		isGoal = true;
 		GetWorld()->GetGameState<ARacingGameState>()->PlayerFinish(this);
-		
+		if(ACarPawn* car = GetPawn<ACarPawn>())
+		{
+			car->isGoal = true;
+			car->freezeMove = true;
+			
+		}
 	}
 
+
+	
 	return true;
 }
 

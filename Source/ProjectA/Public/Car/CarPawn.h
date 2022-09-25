@@ -47,6 +47,9 @@ public:
 	USkeletalMeshComponent* BodyMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* CameraTarget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* CameraComponent;
 
 	//fire
@@ -86,6 +89,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float UpValue;
+
+	UFUNCTION(Client,Reliable)
+	void ClientViewTargetChange();
+	
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnViewTargetChange();
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool isGoal = false;
 	
 private://Controllerに移行
 	void MoveForward(float Value);
