@@ -10,9 +10,13 @@ UCLASS()
 class PROJECTA_API AGoalArea : public AActor
 {
 	GENERATED_BODY()
+
+public:
+	void SetVisiable(bool isVisiable);
+
+	int GetCheckPointNumber() const {return CheckPointNumber;}
 	
-public:	
-	// Sets default values for this actor's properties
+protected:	
 	AGoalArea();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -27,17 +31,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int CheckPointNumber = 1;
-
-	void SetVisiable(bool isVisiable);
 	
 	bool bVisiable = true;
 	
-protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+
 	virtual void Tick(float DeltaTime) override;
 
 };

@@ -13,10 +13,9 @@ UCLASS()
 class PROJECTA_API ALobbyGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+
+protected:
 	ALobbyGameMode();
-	
-public:
 	
 	virtual void BeginPlay() override;
 

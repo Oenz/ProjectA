@@ -17,6 +17,4 @@ ARaceGameMode::ARaceGameMode()
 void ARaceGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
-	//SetMatch
-	//bDelayedStart = true;
 }

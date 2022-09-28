@@ -40,13 +40,13 @@ void ABombItem::UseItem()
 	
 	switch (type)
 	{
-	case EBlendType::Speed:
+	case EUpgradeType::Speed:
 		Projectile->SpeedUp();
 		break;
-	case EBlendType::Range:
+	case EUpgradeType::Range:
 		Projectile->RangeUp();
 		break;
-	case EBlendType::Power:
+	case EUpgradeType::Power:
 		Projectile->PowerUp();
 		break;
 	default:

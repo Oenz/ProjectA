@@ -26,7 +26,11 @@ struct FGoKartMove
 	UPROPERTY()
 	float Time;
 
-	bool IsValid() const { return FMath::Abs(Throttle) <= 1 && FMath::Abs(SteeringThrow) <= 1; }
+	bool IsValid() const 
+	{
+	 	return FMath::Abs(Throttle) <= 1 && 
+	 		FMath::Abs(SteeringThrow) <= 1; 
+	 }
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -35,15 +39,12 @@ class PROJECTA_API UCarMovementComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UCarMovementComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SimulateMove(const FGoKartMove& Move);
@@ -55,7 +56,10 @@ public:
 	void SetSteeringThrow(float Val) { SteeringThrow = Val; };
 	void SetPitch(float Val) { Pitch = Val;};
 
-	FGoKartMove GetLastMove() { return LastMove; };
+	FGoKartMove GetLastMove()
+	{
+		return LastMove;
+	};
 
 private:
 	FGoKartMove CreateMove(float DeltaTime);

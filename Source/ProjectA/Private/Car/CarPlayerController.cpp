@@ -59,21 +59,21 @@ void ACarPlayerController::SetHUD(TSubclassOf<UUserWidget> HUDClass)
 	HUD = HUDWidget;
 }
 
-void ACarPlayerController::OnSwitchBlend()
+void ACarPlayerController::OnUpgradeChanged()
 {
 	UHUDWidget* hud = Cast<UHUDWidget>(HUD);
 	if(hud == nullptr) return;
-	hud->OnBlendSwitch();
+	hud->OnUpgradeChanged();
 }
 
-void ACarPlayerController::OnItemChange()
+void ACarPlayerController::OnItemChanged()
 {
 	UHUDWidget* hud = Cast<UHUDWidget>(HUD);
 	if(hud == nullptr) return;
 	hud->OnItemChanged();
 }
 
-void ACarPlayerController::CarPossessPawn(APawn* PossessPawn)
+void ACarPlayerController::PossessCarPawn(APawn* PossessPawn)
 {
 	
 	SetInputMode(FInputModeGameOnly());
@@ -90,7 +90,7 @@ void ACarPlayerController::CarPossessPawn(APawn* PossessPawn)
 void ACarPlayerController::ClientGameStart_Implementation(APawn* PossessPawn)
 {
 	SetHUD(WaitingHUDClass);
-	CarPossessPawn(PossessPawn);
+	PossessCarPawn(PossessPawn);
 }
 
 void ACarPlayerController::ClientRaceStart_Implementation()

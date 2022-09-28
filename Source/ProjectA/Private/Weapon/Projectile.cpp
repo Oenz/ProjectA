@@ -73,7 +73,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 
 	if(ACarPawn* player = Cast<ACarPawn>(OtherActor))
 	{
-		player->Stan(stanTime);
+		player->SetStan(StanTime);
 	}
 	Destroy();
 }
@@ -93,5 +93,5 @@ void AProjectile::RangeUp()
 
 void AProjectile::PowerUp()
 {
-	stanTime *= 2;
+	StanTime *= 2;
 }

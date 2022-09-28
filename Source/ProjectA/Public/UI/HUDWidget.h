@@ -16,7 +16,7 @@ class PROJECTA_API UHUDWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void OnBlendSwitch();
+	void OnUpgradeChanged();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnItemChanged();

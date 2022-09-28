@@ -16,8 +16,22 @@ class PROJECTA_API ARacingGameState : public AGameState
 {
 	GENERATED_BODY()
 
-	ARacingGameState();
 public:
+	ARacingGameState();
+
+	void PlayerFinish(class APlayerState* const Player);
+
+	TArray<APlayerState*> GetPlayerRanking() { return  PlayerRanking;}
+
+	int32 GetRemainingTime() { return RemainingTime; };
+	
+	void SetTime(int32 time) { RemainingTime = time; };
+	
+	void RaceStart();
+
+	void CountdownTimer() { RemainingTime--; };
+
+protected:
 	UPROPERTY(Transient, Replicated, ReplicatedUsing=OnRep_TimeChanged, BlueprintReadOnly)
 	int32 RemainingTime;
 
@@ -28,11 +42,10 @@ public:
 	
 	TArray<class ACarPlayerState*> PlayerList;
 
-	void PlayerFinish(class APlayerState* Player);
+
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	void RaceStart();
 	
 	UFUNCTION()
 	void OnRep_TimeChanged();
@@ -42,5 +55,5 @@ public:
 
 	FTimeChangedDelegate TimeChangedDelegate;
 
-	void SetTime(int32 time) { RemainingTime = time; };
+	
 };

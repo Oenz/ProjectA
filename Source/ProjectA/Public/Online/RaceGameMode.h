@@ -6,15 +6,12 @@
 #include "GameFramework/GameModeBase.h"
 #include "RaceGameMode.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PROJECTA_API ARaceGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-	public:
+	protected:
 	ARaceGameMode();
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;

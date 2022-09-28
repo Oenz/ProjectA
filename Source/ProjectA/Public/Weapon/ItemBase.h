@@ -14,9 +14,15 @@ class PROJECTA_API AItemBase : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
+public:
 	AItemBase();
+
+	virtual void UseItem();
+
+	void HitProjectile(AActor* Player);
+
+protected:
+	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ItemName;
@@ -26,18 +32,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* MeshComponent;
-		
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void UseItem();
-
-	void HitProjectile(AActor* Player);
 
 	UPROPERTY(ReplicatedUsing=OnRep_Equiped, EditAnywhere, BlueprintReadOnly)
 	bool bEquiped = false;

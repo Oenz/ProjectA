@@ -27,10 +27,14 @@ struct FHermiteCubicSpline
 	FVector StartLocation, StartDerivative, TargetLocation, TargetDerivative;
 
 	FVector InterpolateLocation(float LerpRadio) const
-	{ return FMath::CubicInterp(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LerpRadio); }
+	{
+		return FMath::CubicInterp(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LerpRadio);
+	}
 
 	FVector InterpolateDerivative(float LerpRadio) const
-	{ return FMath::CubicInterpDerivative(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LerpRadio); }
+	{
+		return FMath::CubicInterpDerivative(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LerpRadio);
+	}
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -39,18 +43,15 @@ class PROJECTA_API UCarMovementReplicatorComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UCarMovementReplicatorComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetMeshOffsetRoot(USceneComponent* Root) { MeshOffsetRoot = Root; }
+	
+protected:
+	virtual void BeginPlay() override;
+	
 private:
 	void ClearAcknowledgeMoves(FGoKartMove LastMove);
 
@@ -72,7 +73,7 @@ private:
 	UFUNCTION()
 		void OnRep_ServerState();
 
-	UFUNCTION(Server, Reliable)//, WithValidation)
+	UFUNCTION(Server, Reliable)
 		void Server_SendMove(FGoKartMove Move);
 
 	void AutonomousProxy_OnRep_ServerState();
@@ -94,7 +95,4 @@ private:
 
 	UPROPERTY()
 	USceneComponent* MeshOffsetRoot;
-
-	//UFUNCTION(BlueprintCallable)
-
 };

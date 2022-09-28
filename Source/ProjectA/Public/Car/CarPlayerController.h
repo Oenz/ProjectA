@@ -17,6 +17,25 @@ class PROJECTA_API ACarPlayerController : public APlayerController
 public:
 	ACarPlayerController();
 
+	UFUNCTION()
+	void OnUpgradeChanged();
+
+	void OnItemChanged();
+
+	UFUNCTION(Reliable, Client)
+	void ClientGameStart(APawn* PossessCarPawn);
+	
+	UFUNCTION(Reliable, Client)
+	void ClientRaceStart();
+	
+	UFUNCTION(Reliable, Client)
+	void ClientRaceEnd();
+
+	UUserWidget* GetHUD() {return HUD;};
+
+	void PossessCarPawn(APawn* PossessPawn);
+	
+protected:
 	TSubclassOf<class UUserWidget> SpectorHUDClass;
 	
 	TSubclassOf<class UUserWidget> GameHUDClass;
@@ -26,8 +45,6 @@ public:
 	TSubclassOf<class UUserWidget> GoalHUDClass;
 
 	UUserWidget* HUD;
-
-	UUserWidget* GetHUD() {return HUD;};
 	
 	virtual void BeginPlay() override;
 
@@ -37,21 +54,5 @@ public:
 	
 	void Ready();
 	
-	UFUNCTION()
-	void OnSwitchBlend();
 
-	void OnItemChange();
-
-	void CarPossessPawn(APawn* PossessPawn);
-	
-	UFUNCTION(Reliable, Client)
-	void ClientGameStart(APawn* PossessPawn);
-	
-	UFUNCTION(Reliable, Client)
-	void ClientRaceStart();
-
-	
-	UFUNCTION(Reliable, Client)
-	void ClientRaceEnd();
-	
 };

@@ -2,11 +2,11 @@
 
 
 #include "Online/RacingGameMode.h"
-
 #include "Car/CarPawn.h"
 #include "Car/CarPlayerController.h"
 #include "Car/CarSpectatorPawn.h"
 #include "Catch2/catch.hpp"
+#include "Online/RacingGameState.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Online/CarPlayerState.h"
@@ -54,7 +54,7 @@ void ARacingGameMode::ReadyForStart()
 
 		if(ACarPlayerController* CarPlayerController = Cast<ACarPlayerController>(PlayerController))
 		{
-			CarPlayerController->CarPossessPawn(SpawnedPawn);
+			CarPlayerController->PossessCarPawn(SpawnedPawn);
 		}
 	}
 }
@@ -68,13 +68,6 @@ void ARacingGameMode::PreLogin(const FString& Options, const FString& Address, c
 void ARacingGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
-	//if (GetMatchState() == MatchState::WaitingToStart && NumPlayers == 1)
-	//{
-	//	GameState = GetGameState<ARacingGameState>();
-	//	GameState->SetTime(WaitingForStartTime);
-	//	StartTimer();
-	//}
 }
 
 void ARacingGameMode::CheckAllPlayersReady()
@@ -97,7 +90,6 @@ void ARacingGameMode::CheckAllPlayersReady()
 		GameState->SetTime(WaitingForStartTime);
 		StartTimer();
 	}
-
 }
 
 void ARacingGameMode::Logout(AController* Exiting)
@@ -116,8 +108,6 @@ void ARacingGameMode::HandleMatchHasStarted()
 	Super::HandleMatchHasStarted();
 
 	ReadyForStart();
-	//FTimerHandle timer;
-	//GetWorld()->GetTimerManager().SetTimer(timer,this, &ARacingGameMode::ReadyForStart ,3.0f, false);
 }
 
 void ARacingGameMode::StartTimer()
@@ -140,20 +130,18 @@ void ARacingGameMode::RaceStart()
 		PlayerController->ClientRaceStart();
 		if(ACarPawn* player = Cast<ACarPawn>(PlayerController->GetPawn()))
 		{
-			player->freezeMove = false;
+			player->SetStart();
 		}
-		
 	}
 	GetGameState<ARacingGameState>()->RaceStart();
-	//PC->ClientGameStart();
 }
 
 void ARacingGameMode::CountTimer()
 {
 	if(bRaceStarted) return;
-	GameState->RemainingTime--;
+	GameState->CountdownTimer();
 
-	if(GameState->RemainingTime != 0) return;
+	if(GameState->GetRemainingTime() != 0) return;
 	
 	if(GetMatchState() == MatchState::WaitingToStart)
 	{

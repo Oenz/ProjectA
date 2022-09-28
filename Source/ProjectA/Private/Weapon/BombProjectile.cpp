@@ -14,7 +14,7 @@ void ABombProjectile::BeginPlay()
 	Super::BeginPlay();
 
 
-	GetWorldTimerManager().SetTimer(_timer, this, &ABombProjectile::Explosion, lifetime, false);
+	GetWorldTimerManager().SetTimer(Timer, this, &ABombProjectile::Explosion, lifetime, false);
 }
 
 void ABombProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -32,7 +32,7 @@ void ABombProjectile::Explosion()
 	//DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 50, FColor::Purple, true, 3);
 
 	CollisionComponent->SetCollisionProfileName("NoCollision");
-	GetWorld()->GetTimerManager().ClearTimer(_timer);
+	GetWorld()->GetTimerManager().ClearTimer(Timer);
 	/*if(ExplosionParticle != nullptr)
 	{
 		UParticleSystemComponent* _PSC = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle,GetActorLocation(), FRotator::ZeroRotator, FVector::One() *	ParticleScale, true);
@@ -59,7 +59,7 @@ void ABombProjectile::Explosion()
 			if(ACarPawn* Player =  Cast<ACarPawn>(HitObject))
 			{
 				if(HitObject == GetOwner()) break;
-				Player->Stan(StanTime);
+				Player->SetStan(StanTime);
 			}
 		}
 	}

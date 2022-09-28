@@ -7,7 +7,7 @@
 #include "InventoryComponent.generated.h"
 
 UENUM(BlueprintType)
-enum class EBlendType : uint8
+enum class EUpgradeType : uint8
 {
 	Speed,
 	Range,
@@ -42,11 +42,11 @@ public:
 
 	void EquipItem(class AItemBase* item);
 
-	void SwitchBlend();
+	void ChangeUpgrade();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	EBlendType BlendType;
+	EUpgradeType UpgradeType;
 
 	UFUNCTION(Unreliable, Server)
-	void ServerSetBlendType(int type);
+	void ServerSetUpgradeType(int type);
 };

@@ -18,6 +18,20 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
+	UFUNCTION()
+	virtual void SpeedUp();
+
+	UFUNCTION()
+	virtual void RangeUp();
+
+	UFUNCTION()
+	virtual void PowerUp();
+
+	UFUNCTION(BlueprintCallable)
+	void FireInDirection(const FVector& ShootDirection);
+	
+protected:
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USphereComponent* CollisionComponent;
 	
@@ -30,28 +44,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UParticleSystemComponent* HitParticle;
 	
-protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
+	
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable)
-	void FireInDirection(const FVector& ShootDirection);
 
 	UFUNCTION(Category="Projectile")
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	UFUNCTION()
-	virtual  void SpeedUp();
-
-	UFUNCTION()
-	virtual  void RangeUp();
-
-	UFUNCTION()
-	virtual  void PowerUp();
-
-	float stanTime = 3;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float StanTime = 3;
 };

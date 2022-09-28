@@ -22,14 +22,10 @@ bool ACarPlayerState::SetCheckPoint(int num)
 		GetWorld()->GetGameState<ARacingGameState>()->PlayerFinish(this);
 		if(ACarPawn* car = GetPawn<ACarPawn>())
 		{
-			car->isGoal = true;
-			car->freezeMove = true;
+			car->SetGoal();
 			
 		}
 	}
-
-
-	
 	return true;
 }
 
@@ -52,22 +48,17 @@ void ACarPlayerState::GetDistance()
 		//Debug.Log($"GOAL");
 		return;
 	}
-
 	
 	GoalDistance = FVector::Distance(GetPawn()->GetActorLocation(), goals[CurrentCheckPoint]->GetActorLocation());
-
-
-	
 	for (int i = CurrentCheckPoint; i < goals.Num() - 1; i++)
 	{
 		GoalDistance +=  FVector::Distance(goals[i]->GetActorLocation(), goals[i + 1]->GetActorLocation());
 	}
 
 	//Debug.Log($"To Goal Distance : {Distance}m Current : {CheckPointIndex}");
-
 	if(!HasAuthority()) return;
 	ARacingGameState* GameState = GetWorld()->GetGameState<ARacingGameState>();
-	Ranking = GameState->PlayerRanking.Find(this) + 1;
+	Ranking = GameState->GetPlayerRanking().Find(this) + 1;
 }
 
 void ACarPlayerState::ServerPlayerReady_Implementation(bool ready)
@@ -92,11 +83,10 @@ void ACarPlayerState::BeginPlay()
 		if(AGoalArea* goal = CastChecked<AGoalArea>(actor))
 		{
 			goals.Add(goal);
-			//goals.EmplaceAt(goal->CheckPointNumber -1, goal);
 		}
 	}
 	goals.Sort([](const AGoalArea& A, const AGoalArea& B) {
-	return A.CheckPointNumber < B.CheckPointNumber;
+	return A.GetCheckPointNumber() < B.GetCheckPointNumber();
 	});
 	
 	OnRep_CurrentCheckPoint();
@@ -108,7 +98,7 @@ void ACarPlayerState::OnRep_CurrentCheckPoint()
 	if(this->GetPlayerController() == nullptr) return;
 	for (AGoalArea* actor : goals)
 	{
-		actor->SetVisiable(actor->CheckPointNumber == CurrentCheckPoint + 1);
+		actor->SetVisiable(actor->GetCheckPointNumber() == CurrentCheckPoint + 1);
 	}
 }
 

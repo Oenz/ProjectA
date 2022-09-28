@@ -22,11 +22,9 @@
 // Sets default values
 ACarPawn::ACarPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
     AActor::SetReplicateMovement(false);
-	//bReplicateMovement =  true;
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("BOXCollider"));
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	BodyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyMesh"));
@@ -36,30 +34,20 @@ ACarPawn::ACarPawn()
 	CameraTarget = CreateDefaultSubobject<USceneComponent>(TEXT("CameraTarget"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	
-	//RootComponent = DefaultSceneRoot;
 	DefaultSceneRoot->SetupAttachment(BoxCollider);
 	BodyMesh->SetupAttachment(DefaultSceneRoot);
 	
-
-	//USkeletalMesh* LoadBody = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
 	USkeletalMesh* LoadBody = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Assets/VigilanteContent/Vehicles/East_Fighter_Su33/SK_East_Fighter_Su33.SK_East_Fighter_Su33"), NULL, LOAD_None, NULL);
 	BodyMesh->SetSkeletalMesh(LoadBody);
-
-	//BodyMesh->SetRelativeScale3D(FVector(0.25f,0.25f,0.25f));
-
+	
 	CameraTarget->SetupAttachment(BodyMesh);
 	CameraTarget->SetRelativeLocation(FVector(-1800,0,750));
 	CameraTarget->SetRelativeRotation(FRotator(0, 0, 0));
-
-	//BoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//BoxCollider->SetCollisionResponseToChannel(ECollisionChannel::ECC_Vehicle, ECollisionResponse::ECR_Block);
+	
 	BoxCollider->SetCollisionProfileName("NoCollision");
-	//BoxCollider->SetHiddenInGame(false);
 	BoxCollider->SetBoxExtent(FVector(230, 90, 80));
 	BoxCollider->SetGenerateOverlapEvents(true);
 	BoxCollider->BodyInstance.bNotifyRigidBodyCollision = true;
-
-	//Projectile = LoadObject<UStaticMesh>(NULL, TEXT("/Game/Assets/VehicleVarietyPack/Skeletons/SK_SportsCar.SK_SportsCar"), NULL, LOAD_None, NULL);
 	
 	Tags.Add(FName("Player"));
 }
@@ -73,23 +61,13 @@ void ACarPawn::BeginPlay()
 	{
 		ProjectileLauncher = GetWorld()->SpawnActor<AProjectileLauncher>(GetActorLocation(), GetActorRotation());
 		ProjectileLauncher->AttachToComponent(BoxCollider, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		ProjectileLauncher->SetActorRelativeLocation(GetActorForwardVector() * 2000);//
+		ProjectileLauncher->SetActorRelativeLocation(GetActorForwardVector() * 2000);
 		ProjectileLauncher->SetOwner(this);
 		
 		NetUpdateFrequency = 10;
 	}
 
 	freezeMove = true;
-	
-
-
-	
-	
-	//Cast<ACarPlayerController>(GetController())->SetHUD();
-	/*UBlueprint* WBP = LoadObject<UBlueprint>(NULL, TEXT("/Game/Widget/WBP_HUD.WBP_HUD"));
-	TSubclassOf<UUserWidget> HUDWidget = WBP->GeneratedClass;
-	UUserWidget* hud = CreateWidget<UUserWidget>(GetWorld(), HUDWidget);
-	hud->AddToViewport();*/
 }
 
 FString GetEnumText(ENetRole Role)
@@ -109,7 +87,6 @@ FString GetEnumText(ENetRole Role)
 	}
 }
 
-// Called every frame
 void ACarPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -117,7 +94,6 @@ void ACarPawn::Tick(float DeltaTime)
 	//DrawDebugString(GetWorld(), FVector(0, 0, 100), UEnum::GetValueAsString(GetLocalRole()), this, FColor::White, DeltaTime);
 }
 
-// Called to bind functionality to input
 void ACarPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -127,7 +103,7 @@ void ACarPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &ACarPawn::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released,this, &ACarPawn::StopFire);
 	PlayerInputComponent->BindAction("Use", IE_Pressed, this, &ACarPawn::Use);
-	PlayerInputComponent->BindAction("SwitchBlend", IE_Pressed, this, &ACarPawn::SwitchBlend);
+	PlayerInputComponent->BindAction("ChangeUpgrade", IE_Pressed, this, &ACarPawn::SelectUpgrade);
 }
 
 void ACarPawn::ClientViewTargetChange_Implementation()
@@ -193,12 +169,12 @@ void ACarPawn::Use()
 	InventoryComponent->UseCurrentItem();
 }
 
-void ACarPawn::SwitchBlend()
+void ACarPawn::SelectUpgrade()
 {
 	if(freezeMove) return;
-	InventoryComponent->SwitchBlend();
+	InventoryComponent->ChangeUpgrade();
 	ACarPlayerController* CPC = Cast<ACarPlayerController>(GetController());
-	CPC->OnSwitchBlend();
+	CPC->OnUpgradeChanged();
 }
 
 bool ACarPawn::UsingController()
@@ -206,41 +182,48 @@ bool ACarPawn::UsingController()
 	return GetInputAxisValue("checker") != 0.0f;
 }
 
-void ACarPawn::Stan(float second)
+void ACarPawn::SetStan(float second)
 {
 	if(!HasAuthority()) return;
 	if(freezeMove) return;
 	FTimerHandle _TimerHandle;
 
 	freezeMove = true;
-	GetWorld()->GetTimerManager().SetTimer(_TimerHandle, this, &ACarPawn::EndStan,second, false);
+	GetWorld()->GetTimerManager().SetTimer(_TimerHandle, this, &ACarPawn::SetEndStan,second, false);
 
 }
 
-void ACarPawn::EndStan()
+void ACarPawn::SetEndStan()
 {
 	if(!HasAuthority()) return;
 	freezeMove = false;
 }
 
+void ACarPawn::SetStart()
+{
+	freezeMove = false;
+}
+
+void ACarPawn::SetGoal()
+{
+	freezeMove = true;
+	bGoal = true;
+}
+
 void ACarPawn::OnRep_FreezeMove()
 {
-
 	/*if (GEngine) 
 	{
 		FString str = FString::Printf(TEXT("Freeze"));
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, str);
 	}*/
-
 	
 	if(freezeMove)
 	{
 		MovementComponent->SetThrottle(0);
 		MovementComponent->SetSteeringThrow(0);
 		MovementComponent->SetPitch(0);
-		if(!isGoal)OnStan();
-
-		
+		if(!bGoal)OnStan();
 		//DrawDebugBox(GetWorld(), GetActorLocation(), FVector::One() * 100, FColor::Red, true, 5);
 	}
 	else
@@ -270,5 +253,5 @@ void ACarPawn::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifet
 	
 	DOREPLIFETIME_CONDITION(ACarPawn, ProjectileLauncher, COND_OwnerOnly);
 	DOREPLIFETIME(ACarPawn, freezeMove);
-	DOREPLIFETIME(ACarPawn, isGoal);
+	DOREPLIFETIME(ACarPawn, bGoal);
 }

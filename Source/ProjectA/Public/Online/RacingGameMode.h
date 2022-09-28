@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RacingGameState.h"
 #include "GameFramework/GameMode.h"
 #include "RacingGameMode.generated.h"
 
@@ -15,8 +14,12 @@ class PROJECTA_API ARacingGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
+public:
 	ARacingGameMode();
 	
+	void CheckAllPlayersReady();
+
+protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	
     void ReadyForStart();
@@ -32,8 +35,7 @@ class PROJECTA_API ARacingGameMode : public AGameMode
 	virtual void HandleMatchHasStarted() override;
 
 	class ARacingGameState* GameState;
-
-public:
+	
 	TSubclassOf<APawn> RacingPawnClass;
 
 	void StartTimer();
@@ -47,10 +49,10 @@ public:
 	FTimerHandle TimerHandle;
 
 	void CountTimer();
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 WaitingForStartTime = 5;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 WaitingForRaceTime = 7;
-
-	void CheckAllPlayersReady();
 };

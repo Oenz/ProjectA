@@ -58,7 +58,7 @@ void AProjectileLauncher::FireProjectile(TSubclassOf<AProjectile> ProjectileObje
 	{
 		//Projectile->GetInstigator();
 		SpawnProjectile->SetOwner(GetOwner());
-		if (inv->BlendType == EBlendType::Speed) SpawnProjectile->SpeedUp();
+		if (inv->UpgradeType == EUpgradeType::Speed) SpawnProjectile->SpeedUp();
 		UGameplayStatics::FinishSpawningActor(SpawnProjectile, spawnTfm);
 	}
 
@@ -66,12 +66,12 @@ void AProjectileLauncher::FireProjectile(TSubclassOf<AProjectile> ProjectileObje
 	FireDirection.Normalize();
 	SpawnProjectile->FireInDirection(FireDirection);
 
-	switch (inv->BlendType)
+	switch (inv->UpgradeType)
 	{
-		case EBlendType::Range:
+		case EUpgradeType::Range:
 			SpawnProjectile->RangeUp();
 			break;
-		case EBlendType::Power:
+		case EUpgradeType::Power:
 			SpawnProjectile->PowerUp();
 			break;
 		default:

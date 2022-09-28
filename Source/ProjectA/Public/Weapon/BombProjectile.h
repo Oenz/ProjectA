@@ -15,7 +15,7 @@ class PROJECTA_API ABombProjectile : public AProjectile
 	GENERATED_BODY()
 	
 public:
-	FTimerHandle _timer;
+	FTimerHandle Timer;
 	
 	virtual void BeginPlay() override;
 	
@@ -36,9 +36,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing=OnExplosion)
 	float ParticleScale = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float StanTime = 7;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnExplosion();

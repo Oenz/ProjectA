@@ -13,21 +13,28 @@ class PROJECTA_API ACarPawn : public APawn
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	ACarPawn();
 
+	UFUNCTION(BlueprintCallable)
+	void SetStan(float second);
+
+	UFUNCTION(BlueprintCallable)
+	void SetEndStan();
+
+	void SetStart();
+	
+	void SetGoal();
+
+	UFUNCTION(Client,Reliable)
+	void ClientViewTargetChange();
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UBoxComponent* BoxCollider;
 	
@@ -51,11 +58,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCameraComponent* CameraComponent;
-
-	//fire
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//class UStaticMesh* Projectile;
-
+	
 	UPROPERTY(Replicated)
 	class AProjectileLauncher* ProjectileLauncher;
 
@@ -63,10 +66,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnRaceStart();
-
-	UFUNCTION(BlueprintCallable)
-	void Stan(float second);
-	void EndStan();
+	
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnStan();
@@ -89,18 +89,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float UpValue;
-
-	UFUNCTION(Client,Reliable)
-	void ClientViewTargetChange();
+	
 	
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnViewTargetChange();
 
 	UPROPERTY(Replicated, BlueprintReadOnly)
-	bool isGoal = false;
+	bool bGoal = false;
 	
-private://Controllerに移行
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
@@ -113,7 +110,7 @@ private://Controllerに移行
 	
 	void Use();
 
-	void SwitchBlend();
+	void SelectUpgrade();
 
 	bool UsingController();
 };
