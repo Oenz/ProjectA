@@ -152,7 +152,7 @@ void ACarPawn::MoveUp(float Value)
 void ACarPawn::StartFire()
 {
 	if(freezeMove) return;
-	//if(ProjectileLauncher == nullptr) return;
+	if(ProjectileLauncher == nullptr) return;
 	
 	ProjectileLauncher->StartDefaultFire();
 }

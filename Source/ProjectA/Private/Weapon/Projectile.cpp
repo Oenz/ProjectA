@@ -12,10 +12,7 @@ AProjectile::AProjectile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	bReplicates = true;
-	
-	//SetReplicates(true);
 	SetReplicateMovement(true);
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
@@ -61,9 +58,6 @@ void AProjectile::FireInDirection(const FVector& ShootDirection)
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                         FVector NormalImpulse, const FHitResult& Hit)
 {
-	//if(HitParticle == nullptr) return;
-	//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, Hit.ImpactPoint);
-	//if(!HasAuthority()) return;
 	UE_LOG(LogTemp, Warning, TEXT("Projectile Hit"));
 	
 	if(AItemBase* item = Cast<AItemBase>(OtherActor))
@@ -82,7 +76,6 @@ void AProjectile::SpeedUp()
 {
 	ProjectileMovementComponent->InitialSpeed *= 2;
 	ProjectileMovementComponent->MaxSpeed *= 2;
-	//ProjectileMovementComponent->AddForce(ProjectileMovementComponent->Velocity * 3);
 }
 
 void AProjectile::RangeUp()
